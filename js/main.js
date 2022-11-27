@@ -1,7 +1,8 @@
 ﻿import * as THREE from '/3js/build/three.module.js'
 import WebGLcheck from '/js/compatibility-check.js'
 import * as dat from '/js/dat.gui.min.js'
-import { VRButton } from '/canvas_gui/VRButton.js'
+import { VRButton } from '/3js/examples/jsm/webxr/VRButton_ctr.js'
+import { PointerLockControls } from '/3js/examples/jsm/controls/PointerLockControls.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
 renderer.setPixelRatio(window.devicePixelRatio)
@@ -14,7 +15,6 @@ const textureLoader = new THREE.TextureLoader()
 /**
  * add GUI
  */
-new VRButton(renderer)
 
 const gui = new dat.GUI()
 const options = {
@@ -24,7 +24,7 @@ const options = {
 	'sLight angle': 0.3,
 	'sLight penumbra': 0.1,
 	'sLight intensity': 1,
-	'aLight intensity': 1.8,
+	'aLight intensity': 1,
 	WebXR: false
 }
 
@@ -37,21 +37,19 @@ gui.add(options, 'Sphere visible').onChange(function (e) {
 	}
 })
 
-
 gui.add(options, 'Sphere wireframe').onChange(function (e) {
 	sphere.material.wireframe = e
 })
 
-
 gui.add(options, 'spot Light shadow').onChange(function (e) {
-	directionalLight.castShadow = e
+	spotLight.castShadow = e
 })
 
 gui.add(options, 'WebXR').onChange(function (e) {
 	if (e) {
 		renderer.xr.enabled = e
 		renderer.xr.setReferenceSpaceType('local')
-		// document.body.appendChild(VRButton.createButton(renderer))
+		document.body.appendChild(VRButton.createButton(renderer))
 	} else {
 		renderer.xr.enabled = e
 		var node = document.getElementById('VRButton')
@@ -74,19 +72,18 @@ gui.add(options, 'aLight intensity', 0, 10)
  */
 
 /** fog effect setting */
-scene.fog = new THREE.FogExp2(0xffffff, 0.015)
+// scene.fog = new THREE.FogExp2(0xffffff, 0.015)
 // scene.fog = new THREE.Fog(0xffffff,0, 200)
 
 /** scene background  setting */
 // renderer.setClearColor(0xffea00)
 const stars = '/asset/img/stars.jpg'
-scene.background = textureLoader.load(stars)
+const sceneImg6 =
+	'https://cdn.glitch.me/3bb6e432-db98-42e3-9331-6fb68707bea8/scene_6.jpg?v=1669557198160'
 
 /** ambient light effect setting */
 const ambientLight = new THREE.AmbientLight(0xffffff)
-console.log(ambientLight)
 scene.add(ambientLight)
-
 
 /** spot light effect setting */
 const spotLight = new THREE.SpotLight(0xff0000)
@@ -100,11 +97,14 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	1000
 )
-
+const pointerL = new PointerLockControls(camera, renderer.domElement)
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 camera.position.set(0, 0, 0)
 camera.lookAt(0, 0, 1)
+document.onclick = () => {
+	pointerL.lock()
+}
 
 /**
  * add xyz axis, x red, y green, z blue
@@ -122,8 +122,8 @@ scene.add(gridsHelper)
 /**
  * add a sphere
  */
-const sceneImg6 = '/asset/img/scene_6.jpg'
-const sphereGeometry = new THREE.SphereGeometry(5, 100, 100)
+
+const sphereGeometry = new THREE.SphereGeometry(999, 99, 99)
 const sphereMaterial = new THREE.MeshStandardMaterial({
 	color: 0xffffff,
 	side: THREE.DoubleSide,
@@ -146,6 +146,7 @@ function setUp() {
 	spotLight.penumbra = options['sLight penumbra']
 	spotLight.intensity = options['sLight intensity']
 	ambientLight.intensity = options['aLight intensity']
+	camera.position.set(0, 0, 0)
 }
 
 function maintainScene() {
