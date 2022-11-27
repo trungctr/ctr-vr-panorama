@@ -78,8 +78,7 @@ gui.add(options, 'aLight intensity', 0, 10)
 /** scene background  setting */
 // renderer.setClearColor(0xffea00)
 const stars = '/asset/img/stars.jpg'
-const sceneImg6 =
-	'https://cdn.glitch.me/3bb6e432-db98-42e3-9331-6fb68707bea8/scene_6.jpg?v=1669557198160'
+const sceneImg6 = '/asset/img/scene_6_flip.jpg'
 
 /** ambient light effect setting */
 const ambientLight = new THREE.AmbientLight(0xffffff)
@@ -126,7 +125,7 @@ scene.add(gridsHelper)
 const sphereGeometry = new THREE.SphereGeometry(999, 99, 99)
 const sphereMaterial = new THREE.MeshStandardMaterial({
 	color: 0xffffff,
-	side: THREE.DoubleSide,
+	side: THREE.BackSide,
 	wireframe: false,
 	map: textureLoader.load(sceneImg6)
 })
