@@ -1,18 +1,20 @@
 ﻿import * as THREE from '/3js/build/three.module.js'
 import WebGLcheck from '/js/compatibility-check.js'
 import * as dat from '/js/dat.gui.min.js'
-import { BoxLineGeometry } from 'https://cdn.skypack.dev/three@0.135/examples/jsm/geometries/BoxLineGeometry.js'
-import { XRControllerModelFactory } from 'https://cdn.skypack.dev/three@0.135/examples/jsm/webxr/XRControllerModelFactory.js'
+import { VRButton } from '/canvas_gui/VRButton.js'
+import { BoxLineGeometry } from '/3js/examples/jsm/geometries/BoxLineGeometry.js'
+import { XRControllerModelFactory } from '/3js/examples/jsm/webxr/XRControllerModelFactory.js'
 
 //cần sửa lại đường dẫn mặc định của module three trong các file examples từ from 'three' thành  from '../../../build/three.module.js'
 import { OrbitControls } from '/3js/examples/jsm/controls/OrbitControls.js'
 
-const renderer = new THREE.WebGL1Renderer()
-const textureLoader = new THREE.TextureLoader()
-renderer.shadowMap.enabled = true
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
 renderer.setPixelRatio(window.devicePixelRatio)
+renderer.shadowMap.enabled = true
 
 const scene = new THREE.Scene()
+
+const textureLoader = new THREE.TextureLoader()
 
 /**
  * add GUI
@@ -48,54 +50,26 @@ gui.add(options, 'sLight shadow').onChange(function (e) {
 	spotLight.castShadow = e
 })
 
+gui.add(options, 'WebXR').onChange(function (e) {
+	if (e) {
+		renderer.xr.enabled = e
+		renderer.xr.setReferenceSpaceType('local')
+		// camera.position.set( 0, 1.6, 0 )
+		document.body.appendChild(VRButton.createButton(renderer))
+	} else {
+		renderer.xr.enabled = e
+		var node = document.getElementById('VRButton')
+		if (node) {
+			node.parentNode.removeChild(node)
+		}
+	}
+})
+
 gui.add(options, 'sLight angle', 0, 1)
 
 gui.add(options, 'sLight penumbra', 0, 1)
 
 gui.add(options, 'sLight intensity', 0, 1)
-
-gui.add(options, 'WebXR').onChange(function (e) {
-	renderer.xr.enabled = e
-	camera.updateProjectionMatrix()
-	const controllerModelFactory = new XRControllerModelFactory()
-
-	// controller
-	const controller = renderer.xr.getController(0)
-	scene.add(controller)
-
-	const controllerGrip = renderer.xr.getControllerGrip(0)
-	controllerGrip.add(
-		controllerModelFactory.createControllerModel(controllerGrip)
-	)
-	scene.add(controllerGrip)
-
-	// controller
-	const controller1 = renderer.xr.getController(1)
-	scene.add(controller1)
-
-	const controllerGrip1 = renderer.xr.getControllerGrip(1)
-	controllerGrip1.add(
-		controllerModelFactory.createControllerModel(controllerGrip1)
-	)
-	scene.add(controllerGrip1)
-
-	//
-	const geometry = new THREE.BufferGeometry().setFromPoints([
-		new THREE.Vector3(0, 0, 0),
-		new THREE.Vector3(0, 0, -1)
-	])
-
-	const line = new THREE.Line(geometry)
-	line.name = 'line'
-	line.scale.z = 10
-
-	controller.add(line.clone())
-	controller1.add(line.clone())
-
-	const selectPressed = false
-
-	console.log('WebXR enabled = ' + e, renderer.xr)
-})
 
 /**
  * add environment effects
