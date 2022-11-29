@@ -1,4 +1,4 @@
-import { Color } from '../3js/build/three.module.js'
+import { Color } from '/ctr-3js-static/3js/build/three.module.js'
 
 class CanvasColorPicker{
     constructor(x, y, w, h, col){
@@ -152,6 +152,7 @@ class CanvasColorPicker{
         //ctx.setTransform(transform);
     }
 }
+
 
 
 export { CanvasColorPicker };

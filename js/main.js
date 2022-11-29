@@ -1,8 +1,8 @@
-﻿import * as THREE from '../3js/build/three.module'
-import WebGLcheck from './js/compatibility-check.js'
-import { VRButton } from '../3js/examples/jsm/webxr/VRButton_ctr.js'
-import { XRControllerModelFactory } from '../3js/examples/jsm/webxr/XRControllerModelFactory.js'
-import { PointerLockControls } from '../3js/examples/jsm/controls/PointerLockControls.js'
+﻿import * as THREE from '/ctr-3js-static/3js/build/three.module'
+import WebGLcheck from '/ctr-3js-static/js/compatibility-check.js'
+import { VRButton } from '/ctr-3js-static/3js/examples/jsm/webxr/VRButton_ctr.js'
+import { XRControllerModelFactory } from '/ctr-3js-static/3js/examples/jsm/webxr/XRControllerModelFactory.js'
+import { PointerLockControls } from '/ctr-3js-static./3js/examples/jsm/controls/PointerLockControls.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
 renderer.setPixelRatio(window.devicePixelRatio)
