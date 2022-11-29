@@ -9,6 +9,7 @@ if (WebGLcheck.isWebGLAvailable()) {
 
 	function enterVR(/*device*/) {
 		let currentSession = null
+		button.style.background = 'rgba(0,255,0,1)'
 		button.textContent = 'BẮT ĐẦU THAM QUAN'
 		button.onclick = function () {
 			if (currentSession === null) {
@@ -35,10 +36,10 @@ if (WebGLcheck.isWebGLAvailable()) {
 
 	function turnToWebGL() {
 		const htmlRun = htmlEnv.run
-		button.style.background = 'rgba(255,0,0,0.5)'
+		button.style.background = 'rgba(0,0,255,1)'
 		button.textContent = 'BẮT ĐẦU THAM QUAN'
 		button.onclick = htmlRun()
-		console.log
+		console.log('usingWebGL')
 	}
 
 	function showVRNotAllowed(exception) {

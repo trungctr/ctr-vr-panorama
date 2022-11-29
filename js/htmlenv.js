@@ -1,5 +1,4 @@
 ﻿import * as THREE from '/ctr-3js-static/3js/build/three.module.js'
-import { VRButton } from '/ctr-3js-static/3js/examples/jsm/webxr/VRButton_ctr.js'
 import { PointerLockControls } from '/ctr-3js-static/3js/examples/jsm/controls/PointerLockControls.js'
 
 const html={
@@ -11,9 +10,6 @@ const html={
 		const scene = new THREE.Scene()
 	
 		const textureLoader = new THREE.TextureLoader()
-	
-		renderer.xr.enabled = true
-		document.body.appendChild(VRButton.createButton(renderer))
 	
 		/**
 		 * add GUI
