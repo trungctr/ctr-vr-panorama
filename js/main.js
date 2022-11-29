@@ -16,7 +16,6 @@ if (WebGLcheck.isWebGLAvailable()) {
 				img.classList.add('hide')
 				tutsButton.classList.add('hide')
 				vrEnv.init()
-
 				const sessionInit = {
 					optionalFeatures: [
 						'local-floor',
@@ -39,6 +38,7 @@ if (WebGLcheck.isWebGLAvailable()) {
 		button.style.background = 'rgba(255,0,0,0.5)'
 		button.textContent = 'BẮT ĐẦU THAM QUAN'
 		button.onclick = htmlRun()
+		console.log
 	}
 
 	function showVRNotAllowed(exception) {
