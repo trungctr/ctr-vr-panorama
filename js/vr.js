@@ -248,3 +248,5 @@ const vr = {
 		renderer.setAnimationLoop(mainLoop)
 	}
 }
+
+export default vr
