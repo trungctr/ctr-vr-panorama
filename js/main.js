@@ -1,4 +1,4 @@
-﻿import * as THREE from '/ctr-3js-static/3js/build/three.module'
+﻿import * as THREE from '/ctr-3js-static/3js/build/three.module.js'
 import WebGLcheck from '/ctr-3js-static/js/compatibility-check.js'
 import { VRButton } from '/ctr-3js-static/3js/examples/jsm/webxr/VRButton_ctr.js'
 import { XRControllerModelFactory } from '/ctr-3js-static/3js/examples/jsm/webxr/XRControllerModelFactory.js'
