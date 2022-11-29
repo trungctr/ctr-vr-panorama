@@ -42,9 +42,19 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 camera.position.set(0, 0, 0)
 camera.lookAt(0, 0, 1)
-document.onclick = () => {
+
+let pointerLocked = false
+document.addEventListener('DOMContentLoaded', () => {
 	pointerL.lock()
-}
+	pointerLocked = true
+})
+document.addEventListener('click', () => {
+	if (pointerLocked == false) {
+		pointerL.lock()
+	} else {
+		pointerL.unlock()
+	}
+})
 
 /**
  * add xyz axis, x red, y green, z blue
