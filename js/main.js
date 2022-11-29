@@ -12,6 +12,9 @@ const scene = new THREE.Scene()
 
 const textureLoader = new THREE.TextureLoader()
 
+renderer.xr.enabled = true
+document.body.appendChild(VRButton.createButton(renderer))
+
 /**
  * add GUI
  */
