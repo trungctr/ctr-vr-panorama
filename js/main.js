@@ -94,9 +94,7 @@ scene.add(sphere)
  * Optimized function here
  */
 
-function maintainMethods() {
-	ui.update()
-}
+function maintainMethods() {}
 
 function maintainScene() {
 	window.addEventListener('resize', () => {
