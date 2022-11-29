@@ -1,7 +1,7 @@
 ﻿import * as THREE from '/3js/build/three.module.js'
 import WebGLcheck from '/js/compatibility-check.js'
-import * as dat from '/js/dat.gui.min.js'
 import { VRButton } from '/3js/examples/jsm/webxr/VRButton_ctr.js'
+import { XRControllerModelFactory } from '/3js/examples/jsm/webxr/XRControllerModelFactory.js'
 import { PointerLockControls } from '/3js/examples/jsm/controls/PointerLockControls.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
@@ -13,81 +13,64 @@ const scene = new THREE.Scene()
 const textureLoader = new THREE.TextureLoader()
 
 /**
+ * setup VR/XR
+ */
+renderer.xr.enabled = true
+renderer.xr.setReferenceSpaceType('local')
+document.body.appendChild(VRButton.createButton(renderer))
+
+const controllerModelFactory = new XRControllerModelFactory()
+
+// controller
+const controller = renderer.xr.getController(0)
+scene.add(controller)
+
+const controllerGrip = renderer.xr.getControllerGrip(0)
+controllerGrip.add(controllerModelFactory.createControllerModel(controllerGrip))
+scene.add(controllerGrip)
+
+// controller
+const controller1 = renderer.xr.getController(1)
+scene.add(controller1)
+
+const controllerGrip1 = renderer.xr.getControllerGrip(1)
+controllerGrip1.add(
+	controllerModelFactory.createControllerModel(controllerGrip1)
+)
+scene.add(controllerGrip1)
+
+//
+const geometry = new THREE.BufferGeometry().setFromPoints([
+	new THREE.Vector3(0, 0, 0),
+	new THREE.Vector3(0, 0, -1)
+])
+
+const line = new THREE.Line(geometry)
+line.name = 'line'
+line.scale.z = 10
+
+controller.add(line.clone())
+controller1.add(line.clone())
+
+const selectPressed = false
+
+/**
  * add GUI
  */
-
-const gui = new dat.GUI()
-const options = {
-	'Sphere wireframe': false,
-	'Sphere visible': true,
-	'spot Light shadow': true,
-	'sLight angle': 0.3,
-	'sLight penumbra': 0.1,
-	'sLight intensity': 1,
-	'aLight intensity': 1,
-	WebXR: false
-}
-
-gui.add(options, 'Sphere visible').onChange(function (e) {
-	if (e) {
-		scene.add(sphere)
-	} else {
-		scene.remove(scene.getObjectByName('background'))
-		console.log(sphere)
-	}
-})
-
-gui.add(options, 'Sphere wireframe').onChange(function (e) {
-	sphere.material.wireframe = e
-})
-
-gui.add(options, 'spot Light shadow').onChange(function (e) {
-	spotLight.castShadow = e
-})
-
-gui.add(options, 'WebXR').onChange(function (e) {
-	if (e) {
-		renderer.xr.enabled = e
-		renderer.xr.setReferenceSpaceType('local')
-		document.body.appendChild(VRButton.createButton(renderer))
-	} else {
-		renderer.xr.enabled = e
-		var node = document.getElementById('VRButton')
-		if (node) {
-			node.parentNode.removeChild(node)
-		}
-	}
-})
-
-gui.add(options, 'sLight angle', 0, 1)
-
-gui.add(options, 'sLight penumbra', 0, 1)
-
-gui.add(options, 'sLight intensity', 0, 1)
-
-gui.add(options, 'aLight intensity', 0, 10)
 
 /**
  * add environment effects
  */
 
-/** fog effect setting */
-// scene.fog = new THREE.FogExp2(0xffffff, 0.015)
-// scene.fog = new THREE.Fog(0xffffff,0, 200)
-
 /** scene background  setting */
 // renderer.setClearColor(0xffea00)
 const stars = '/asset/img/stars.jpg'
-const sceneImg6 = '/asset/img/scene_6_flip.jpg'
+const sceneImg6 =
+	'https://cdn.glitch.global/3bb6e432-db98-42e3-9331-6fb68707bea8/scene_6_flip.jpg?v=1669607764141'
 
 /** ambient light effect setting */
 const ambientLight = new THREE.AmbientLight(0xffffff)
 scene.add(ambientLight)
-
-/** spot light effect setting */
-const spotLight = new THREE.SpotLight(0xff0000)
-spotLight.position.set(0, 0, 0)
-scene.add(spotLight)
 
 // camera parameters: field od view, with/height, near(distance form camera to near plan) and far (distance form camera to far plan)
 const camera = new THREE.PerspectiveCamera(
@@ -140,11 +123,6 @@ scene.add(sphere)
  */
 
 function setUp() {
-	spotLight.castShadow = options['sLight shadow']
-	spotLight.angle = options['sLight angle']
-	spotLight.penumbra = options['sLight penumbra']
-	spotLight.intensity = options['sLight intensity']
-	ambientLight.intensity = options['aLight intensity']
 	camera.position.set(0, 0, 0)
 }
 

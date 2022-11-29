@@ -1,4 +1,4 @@
-import { Color } from 'https://cdn.skypack.dev/three@0.135';
+import { Color } from '../3js/build/three.module.js'
 
 class CanvasColorPicker{
     constructor(x, y, w, h, col){
@@ -152,5 +152,6 @@ class CanvasColorPicker{
         //ctx.setTransform(transform);
     }
 }
+
 
 export { CanvasColorPicker };
