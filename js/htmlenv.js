@@ -1,5 +1,4 @@
 ﻿import * as THREE from '/ctr-3js-static/3js/build/three.module.js'
-import WebGLcheck from '/ctr-3js-static/js/compatibility-check.js'
 import { VRButton } from '/ctr-3js-static/3js/examples/jsm/webxr/VRButton_ctr.js'
 import { PointerLockControls } from '/ctr-3js-static/3js/examples/jsm/controls/PointerLockControls.js'
 
@@ -110,21 +109,15 @@ const html={
 		/**
 		 * animation function here
 		 */
-	
+		
+		/**
+		 * main loop
+		 */
 		function mainLoop() {
 			maintainMethods()
 			renderer.render(scene, camera)
 		}
-	
-		/**
-		 * main loop
-		 */
-		if (WebGLcheck.isWebGLAvailable()) {
-			renderer.setAnimationLoop(mainLoop)
-		} else {
-			const warning = WebGLcheck.getWebGLErrorMessage()
-			document.getElementById('container').appendChild(warning)
-		}
+		renderer.setAnimationLoop(mainLoop)
 	}
 }
 
