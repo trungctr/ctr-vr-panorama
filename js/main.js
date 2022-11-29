@@ -9,6 +9,14 @@ if (WebGLcheck.isWebGLAvailable()) {
 
 	function enterVR(/*device*/) {
 		let currentSession = null
+		async function onSessionStarted(session) {
+			session.addEventListener('end', onSessionEnded)
+
+			await renderer.xr.setSession(session)
+			button.textContent = 'EXIT VR'
+
+			currentSession = session
+		}
 		button.style.background = 'rgba(0,255,0,1)'
 		button.textContent = 'BẮT ĐẦU THAM QUAN'
 		button.onclick = function () {
