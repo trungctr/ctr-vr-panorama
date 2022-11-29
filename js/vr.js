@@ -18,7 +18,6 @@ const textureLoader = new THREE.TextureLoader()
  */
 renderer.xr.enabled = true
 renderer.xr.setReferenceSpaceType('local')
-document.body.appendChild(VRButton.createButton(renderer))
 
 const controllerModelFactory = new XRControllerModelFactory()
 
@@ -218,8 +217,8 @@ scene.add(sphere)
  * Optimized function here
  */
 
-function setUp() {
-	camera.position.set(0, 0, 0)
+function maintainMethods() {
+		ui.update()
 }
 
 function maintainScene() {
@@ -236,8 +235,7 @@ maintainScene()
  */
 
 function mainLoop() {
-	setUp()
-	ui.update()
+	maintainMethods()
 	renderer.render(scene, camera)
 }
 
@@ -251,60 +249,30 @@ if (WebGLcheck.isWebGLAvailable()) {
 	document.getElementById('container').appendChild(warning)
 }
 
-
 function enterVR(/*device*/) {
 	let currentSession = null
+	if (currentSession === null) {
+		// WebXR's requestReferenceSpace only works if the corresponding feature
+		// was requested at session creation time. For simplicity, just ask for
+		// the interesting ones as optional features, but be aware that the
+		// requestReferenceSpace call will fail if it turns out to be unavailable.
+		// ('local' is always available for immersive sessions and doesn't need to
+		// be requested separately.)
 
-	async function onSessionStarted(session) {
-		session.addEventListener('end', onSessionEnded)
-
-		await renderer.xr.setSession(session)
-		button.textContent = 'EXIT VR'
-
-		currentSession = session
+		const sessionInit = {
+			optionalFeatures: [
+				'local-floor',
+				'bounded-floor',
+				'hand-tracking',
+				'layers'
+			]
+		}
+		navigator.xr
+			.requestSession('immersive-vr', sessionInit)
+			.then(onSessionStarted)
+	} else {
+		currentSession.end()
 	}
-
-	function onSessionEnded(/*event*/) {
-		currentSession.removeEventListener('end', onSessionEnded)
-
-		button.textContent = 'ENTER VR'
-
-		currentSession = null
-	}
-
-	//
-
-	button.style.display = ''
-
-	button.style.cursor = 'pointer'
-	button.style.left = 'calc(95% - 50px)'
-	button.style.width = '100px'
-
-	button.textContent = 'ENTER VR'
-	stylizeElement(button, true)
-	button.onmouseenter = function () {
-		button.style.opacity = '1.0'
-	}
-
-	button.onmouseleave = function () {
-		button.style.opacity = '0.5'
-	}
-
-	// button.onclick = function () {
-	// 	if (currentSession === null) {
-	// 		// WebXR's requestReferenceSpace only works if the corresponding feature
-	// 		// was requested at session creation time. For simplicity, just ask for
-	// 		// the interesting ones as optional features, but be aware that the
-	// 		// requestReferenceSpace call will fail if it turns out to be unavailable.
-	// 		// ('local' is always available for immersive sessions and doesn't need to
-	// 		// be requested separately.)
-
-	// 		const sessionInit = {
-	// 			optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking', 'layers']
-	// 		};
-	// 		navigator.xr.requestSession('immersive-vr', sessionInit).then(onSessionStarted);
-	// 	} else {
-	// 		currentSession.end();
-	// 	}
-	// };
 }
+
+enterVR()

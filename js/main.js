@@ -1,7 +1,6 @@
 ﻿import * as THREE from '/ctr-3js-static/3js/build/three.module.js'
 import WebGLcheck from '/ctr-3js-static/js/compatibility-check.js'
 import { VRButton } from '/ctr-3js-static/3js/examples/jsm/webxr/VRButton_ctr.js'
-import { XRControllerModelFactory } from '/ctr-3js-static/3js/examples/jsm/webxr/XRControllerModelFactory.js'
 import { PointerLockControls } from '/ctr-3js-static/3js/examples/jsm/controls/PointerLockControls.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
@@ -46,13 +45,15 @@ document.body.appendChild(renderer.domElement)
 camera.position.set(0, 0, 0)
 camera.lookAt(0, 0, 1)
 
-let pointerLocked = false
+const pointerLocked = {
+	isLocked: false
+}
 renderer.domElement.addEventListener('load', () => {
 	pointerL.lock()
-	pointerLocked = true
+	pointerLocked.isLocked = true
 })
 document.addEventListener('click', () => {
-	if (pointerLocked == false) {
+	if (pointerLocked.isLocked == false) {
 		pointerL.lock()
 	} else {
 		pointerL.unlock()
@@ -93,8 +94,8 @@ scene.add(sphere)
  * Optimized function here
  */
 
-function setUp() {
-	camera.position.set(0, 0, 0)
+function maintainMethods() {
+	ui.update()
 }
 
 function maintainScene() {
@@ -111,7 +112,7 @@ maintainScene()
  */
 
 function mainLoop() {
-	setUp()
+	maintainMethods()
 	renderer.render(scene, camera)
 }
 
