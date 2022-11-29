@@ -2,7 +2,7 @@
 import WebGLcheck from '/ctr-3js-static/js/compatibility-check.js'
 import { VRButton } from '/ctr-3js-static/3js/examples/jsm/webxr/VRButton_ctr.js'
 import { XRControllerModelFactory } from '/ctr-3js-static/3js/examples/jsm/webxr/XRControllerModelFactory.js'
-import {PointerLockControls} from '/ctr-3js-static/3js/examples/jsm/controls/PointerLockControls.js'
+import { PointerLockControls } from '/ctr-3js-static/3js/examples/jsm/controls/PointerLockControls.js'
 import { CanvasUI } from '/ctr-3js-static/canvas_gui/CanvasUI.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
@@ -179,8 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('click', () => {
 	if (pointerLocked == false) {
 		pointerL.lock()
-	} else
-	{
+	} else {
 		pointerL.unlock()
 	}
 })
@@ -250,4 +249,62 @@ if (WebGLcheck.isWebGLAvailable()) {
 } else {
 	const warning = WebGLcheck.getWebGLErrorMessage()
 	document.getElementById('container').appendChild(warning)
+}
+
+
+function enterVR(/*device*/) {
+	let currentSession = null
+
+	async function onSessionStarted(session) {
+		session.addEventListener('end', onSessionEnded)
+
+		await renderer.xr.setSession(session)
+		button.textContent = 'EXIT VR'
+
+		currentSession = session
+	}
+
+	function onSessionEnded(/*event*/) {
+		currentSession.removeEventListener('end', onSessionEnded)
+
+		button.textContent = 'ENTER VR'
+
+		currentSession = null
+	}
+
+	//
+
+	button.style.display = ''
+
+	button.style.cursor = 'pointer'
+	button.style.left = 'calc(95% - 50px)'
+	button.style.width = '100px'
+
+	button.textContent = 'ENTER VR'
+	stylizeElement(button, true)
+	button.onmouseenter = function () {
+		button.style.opacity = '1.0'
+	}
+
+	button.onmouseleave = function () {
+		button.style.opacity = '0.5'
+	}
+
+	// button.onclick = function () {
+	// 	if (currentSession === null) {
+	// 		// WebXR's requestReferenceSpace only works if the corresponding feature
+	// 		// was requested at session creation time. For simplicity, just ask for
+	// 		// the interesting ones as optional features, but be aware that the
+	// 		// requestReferenceSpace call will fail if it turns out to be unavailable.
+	// 		// ('local' is always available for immersive sessions and doesn't need to
+	// 		// be requested separately.)
+
+	// 		const sessionInit = {
+	// 			optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking', 'layers']
+	// 		};
+	// 		navigator.xr.requestSession('immersive-vr', sessionInit).then(onSessionStarted);
+	// 	} else {
+	// 		currentSession.end();
+	// 	}
+	// };
 }
