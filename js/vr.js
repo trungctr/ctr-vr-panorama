@@ -2,7 +2,8 @@
 import WebGLcheck from '/ctr-3js-static/js/compatibility-check.js'
 import { VRButton } from '/ctr-3js-static/3js/examples/jsm/webxr/VRButton_ctr.js'
 import { XRControllerModelFactory } from '/ctr-3js-static/3js/examples/jsm/webxr/XRControllerModelFactory.js'
-import { PointerLockControls } from '/ctr-3js-static/3js/examples/jsm/controls/PointerLockControls.js'
+import {PointerLockControls} from '/ctr-3js-static/3js/examples/jsm/controls/PointerLockControls.js'
+import { CanvasUI } from '/ctr-3js-static/canvas_gui/CanvasUI.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
 renderer.setPixelRatio(window.devicePixelRatio)
