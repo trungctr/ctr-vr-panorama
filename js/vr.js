@@ -3,8 +3,7 @@ import { XRControllerModelFactory } from '/ctr-3js-static/3js/examples/jsm/webxr
 import { CanvasUI } from '/ctr-3js-static/canvas_gui/CanvasUI.js'
 
 const vr = {
-	init: () => {
-		const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+	init: ( renderer) => {
 		renderer.setPixelRatio(window.devicePixelRatio)
 		renderer.shadowMap.enabled = true
 		renderer.setSize(window.innerWidth, window.innerHeight)

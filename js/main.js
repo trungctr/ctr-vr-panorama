@@ -1,7 +1,9 @@
-﻿import htmlEnv from '/ctr-3js-static/js/htmlenv.js'
+﻿import * as THREE from '/ctr-3js-static/3js/build/three.module.js'
+import htmlEnv from '/ctr-3js-static/js/htmlenv.js'
 import vrEnv from '/ctr-3js-static/js/vr.js'
 import WebGLcheck from '/ctr-3js-static/js/compatibility-check.js'
-
+const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true})
+		
 if (WebGLcheck.isWebGLAvailable()) {
 	const button = document.getElementById('start-button')
 	const img = document.getElementById('intro-img')
@@ -21,7 +23,7 @@ if (WebGLcheck.isWebGLAvailable()) {
 				button.classList.add('hide')
 				img.classList.add('hide')
 				tutsButton.classList.add('hide')
-				vrEnv.init()
+				vrEnv.init(renderer)
 				const sessionInit = {
 					optionalFeatures: [
 						'local-floor',
