@@ -38,7 +38,7 @@ if (WebGLcheck.isWebGLAvailable()) {
 		const htmlRun = htmlEnv.run
 		button.style.background = 'rgba(0,0,255,1)'
 		button.textContent = 'BẮT ĐẦU THAM QUAN'
-		button.onclick = htmlRun()
+		button.onclick = htmlRun
 		console.log('usingWebGL')
 	}
 
