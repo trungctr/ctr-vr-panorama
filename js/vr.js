@@ -1,6 +1,8 @@
 ﻿import * as THREE from '/ctr-3js-static/3js/build/three.module.js'
 import { XRControllerModelFactory } from '/ctr-3js-static/3js/examples/jsm/webxr/XRControllerModelFactory.js'
 import { CanvasUI } from '/ctr-3js-static/canvas_gui/CanvasUI.js'
+import Areas from '/ctr-3js-static/js/areas.js'
+import Devices from '/ctr-3js-static/js/devices.js'
 
 const vr = {
 	init: ( renderer) => {

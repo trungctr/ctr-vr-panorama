@@ -8,18 +8,15 @@
 		<meta http-equiv='pragma' content='no-cache'>
 		<style>
 			body {
-				background-image: url('/asset/img/bg_intro.jpg');
-				background-size: contain;
-				background-repeat: no-repeat;
 				margin: 0px !important;
 				padding: 0px !important;
 				overflow: hidden !important;
 			}
 
-			img {
-				background-image: url('/asset/img/bg_intro.jpg');
+			#intro-img {
+				background-image: url('/ctr-3js-static/asset/img/bg_intro.jpg');
 				background-size: contain;
-				background-repeat: no-repeat;
+				background-repeat: repeat;
 				margin: 0px !important;
 				padding: 0px !important;
 				overflow: hidden !important;
@@ -28,17 +25,14 @@
 			.hide {
 				display: none !important;
 			}
+			.invisible {
+				visibility: hidden !important;
+			}
 
-			#start-button {
+			#intro_menu{
 				position: absolute;
-				top: 70%;
+				bottom: 10%;
 				left: 50%;
-				height: 50px;
-				border-radius: 5px;
-				border: none;
-				padding: 5px 20px;
-				color: #ffffff;
-				background-color: black;
 				transform: translateX(-50%);
 				-moz-transform: translateX(-50%);
 				-webkit-transform: translateX(-50%);
@@ -46,36 +40,37 @@
 				-ms-transform: translateX(-50%);
 			}
 
-			#tuts {
-				position: absolute;
-				top: 77%;
-				left: 50%;
-				height: 50px;
-				border-radius: 5px;
+			.intro-buton{
+				/* border-radius: 5px; */
 				border: none;
 				padding: 5px 20px;
+				margin-top: 10px;
 				color: #ffffff;
-				background-color: rgba(0,0,255,0.8);
-				transform: translateX(-50%);
-				-moz-transform: translateX(-50%);
-				-webkit-transform: translateX(-50%);
-				-o-transform: translateX(-50%);
-				-ms-transform: translateX(-50%);
+				background-color: rgba(0,0,0,0.8);
+				height: 50px;
+				width: 200px;
 			}
-			#tuts:hover {
-				background-color: rgba(0,0,255,1);
-				border: 2px solid white;
+			.intro-buton:hover{
+				border: 3px solid rgba(255,255,255,1);
 			}
 
 		</style>
 	</head>
 
 	<body>
-		<img class="" id="intro-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-			src="/ctr-3js-static/asset/img/bg_intro.jpg">
-		<button class="" id="start-button"> Loading </button>
-		<button class="" id="tuts">Xem hướng dẫn </button>
-		<script type='module' src="/ctr-3js-static/js/main.js?v=2022.11.29.1500"></script>
+			<img class="intro hide" id="intro-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+				src="/ctr-3js-static/asset/img/bg_intro.jpg">
+				<div id='intro_menu'>
+					<div>
+						<button class="intro intro-buton" id="start-button">LOADING...</button>
+					</div>
+					<div>
+						<button class="intro intro-buton" id="tuts">XEM HƯỚNG DẪN</button>
+					</div>
+				</div>
+				<audio class='hide' src='/ctr-3js-static/asset/voices/F1.m4a' id='SFX-speaker' autoplay></audio>
+				<audio class='hide' src='/ctr-3js-static/asset/voices/Victory-TwoStepsFromHell-BGM.mp3' id='BGM-speaker' autoplay loop></audio>
+		<!-- <script type='module' src="/ctr-3js-static/js/main.js?v=2022.11.29.1500"></script> -->
 	</body>
 
 </HTML>
