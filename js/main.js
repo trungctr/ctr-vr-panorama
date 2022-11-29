@@ -1,5 +1,5 @@
-﻿import HTML from '/ctr-3js-static/js/html.js'
+﻿import htmlEnv from '/ctr-3js-static/js/htmlenv.js'
 
-HTML()
+htmlEnv.htmlRun()
 
-console.log(HTML)
+console.log(htmlEnv)
