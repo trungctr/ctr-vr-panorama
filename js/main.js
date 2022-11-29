@@ -47,7 +47,7 @@ camera.position.set(0, 0, 0)
 camera.lookAt(0, 0, 1)
 
 let pointerLocked = false
-document.addEventListener('DOMContentLoaded', () => {
+renderer.domElement.addEventListener('loaded', () => {
 	pointerL.lock()
 	pointerLocked = true
 })
