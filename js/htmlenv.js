@@ -99,17 +99,14 @@ const html = {
 		 */
 
 		function maintainMethods() {
-				orbit.update()
+			orbit.update()
 		}
 
-		function maintainScene() {
-			window.addEventListener('resize', () => {
-				camera.aspect = window.innerWidth / window.innerHeight
-				camera.updateProjectionMatrix()
-				renderer.setSize(window.innerWidth, window.innerHeight)
-			})
-		}
-		maintainScene()
+		window.addEventListener('resize', () => {
+			camera.aspect = window.innerWidth / window.innerHeight
+			camera.updateProjectionMatrix()
+			renderer.setSize(window.innerWidth, window.innerHeight)
+		})
 
 		/**
 		 * animation function here
