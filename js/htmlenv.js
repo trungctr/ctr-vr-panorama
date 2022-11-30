@@ -40,15 +40,14 @@ const html = {
 		const camera = new THREE.PerspectiveCamera(
 			75,
 			window.innerWidth / window.innerHeight,
-			0.1,
+			0.2,
 			1000
 		)
 		const orbit = new OrbitControls(camera, renderer.domElement)
 		renderer.setSize(window.innerWidth, window.innerHeight)
 		document.body.appendChild(renderer.domElement)
-		camera.position.set(0, 0, 0)
+		camera.position.set(0, 0, 0.1)
 		camera.lookAt(0, 0, 0)
-		orbit.update()
 
 		const pointerLocked = {
 			isLocked: false
@@ -99,7 +98,9 @@ const html = {
 		 * Optimized function here
 		 */
 
-		function maintainMethods() {}
+		function maintainMethods() {
+				orbit.update()
+		}
 
 		function maintainScene() {
 			window.addEventListener('resize', () => {
