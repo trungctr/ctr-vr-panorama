@@ -1,5 +1,5 @@
 ﻿import * as THREE from '/ctr-3js-static/3js/build/three.module.js'
-import { PointerLockControls } from '/ctr-3js-static/3js/examples/jsm/controls/PointerLockControls.js'
+import { OrbitControls } from '/ctr-3js-static/3js/examples/jsm/controls/OrbitControls.js'
 
 function clearBody() {
 	document.getElementById('start-button').classList.add('hide')
@@ -43,26 +43,26 @@ const html = {
 			0.1,
 			1000
 		)
-		const pointerL = new PointerLockControls(camera, renderer.domElement)
+		const OrbitControls = new OrbitControls(camera, renderer.domElement)
 		renderer.setSize(window.innerWidth, window.innerHeight)
 		document.body.appendChild(renderer.domElement)
 		camera.position.set(0, 0, 0)
-		camera.lookAt(0, 0, 1)
+		camera.lookAt(0, 0, 0)
 
 		const pointerLocked = {
 			isLocked: false
 		}
-		renderer.domElement.addEventListener('load', () => {
-			pointerL.lock()
-			pointerLocked.isLocked = true
-		})
-		document.addEventListener('click', () => {
-			if (pointerLocked.isLocked == false) {
-				pointerL.lock()
-			} else {
-				pointerL.unlock()
-			}
-		})
+		// renderer.domElement.addEventListener('load', () => {
+		// 	pointerL.lock()
+		// 	pointerLocked.isLocked = true
+		// })
+		// document.addEventListener('click', () => {
+		// 	if (pointerLocked.isLocked == false) {
+		// 		pointerL.lock()
+		// 	} else {
+		// 		pointerL.unlock()
+		// 	}
+		// })
 
 		/**
 		 * add xyz axis, x red, y green, z blue
