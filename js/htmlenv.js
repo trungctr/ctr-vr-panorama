@@ -29,7 +29,7 @@ const html = {
 			opacity: 0.8
 		})
 		const plane = new THREE.Mesh(planeGeometry, planeMaterial)
-		plane.rotation.x = -0.5 * Math.PI
+		// plane.rotation.x = -0.5 * Math.PI
 		scene.add(plane)
 		let mouseCoord = new THREE.Vector2()
 		let planeNormal = new THREE.Vector3()
