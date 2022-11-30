@@ -43,11 +43,12 @@ const html = {
 			0.1,
 			1000
 		)
-		const OrbitControls = new OrbitControls(camera, renderer.domElement)
+		const orbit = new OrbitControls(camera, renderer.domElement)
 		renderer.setSize(window.innerWidth, window.innerHeight)
 		document.body.appendChild(renderer.domElement)
 		camera.position.set(0, 0, 0)
 		camera.lookAt(0, 0, 0)
+		orbit.update()
 
 		const pointerLocked = {
 			isLocked: false
