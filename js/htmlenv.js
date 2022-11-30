@@ -28,17 +28,32 @@ const html = {
 			transparent: true,
 			opacity: 0.8
 		})
-		const plane = new THREE.plane(planeGeometry, planeMaterial)
-		plane.rotation.y = -0.5 * Math.PI
-		scene.add(plane)
+		const plane1 = new THREE.mesh(planeGeometry, planeMaterial)
+		scene.add(plane1)
+		
 		let mouseCoord = new THREE.Vector2()
 		let planeNormal = new THREE.Vector3()
+		let plane = new THREE.plane(camera.position)
+		scene.add(plane)
+		plane.add(plane1)
 		window.addEventListener('mousemove', (e) => {
 			mouseCoord.x = (e.clientX/ window.innerWidth)*2 -1
 			mouseCoord.y = (e.clientY / window.innerHeight) * 2 + 1
 			planeNormal.copy(camera.position).normalize()
 			plane.setFromNormalAndCoplanarPoint(planeNormal, scene.position)
 		})
+		let cameraLookAt
+		let cameraPosition
+		function checkCamPos() {
+			let curPos = camera.position
+			let curLookAt = camera.lookAt
+			if (curPos != cameraPosition || curLookAt != cameraLookAt)
+			{
+				console.log(curPos, curLookAt)
+				cameraPosition = curPos
+				cameraLookAt = curLookAt
+			}
+		}
 		/**
 		 * add environment effects
 		 */
@@ -102,6 +117,7 @@ const html = {
 
 		function maintainMethods() {
 			orbit.update()
+			checkCamPos()
 		}
 
 		window.addEventListener('resize', () => {
