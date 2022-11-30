@@ -37,7 +37,7 @@ const html = {
 			mouseCoord.x = (e.clientX/ window.innerWidth)*2 -1
 			mouseCoord.y = (e.clientY / window.innerHeight) * 2 + 1
 			planeNormal.copy(camera.position).normalize()
-			plane.setFromNormalAndCoplanarPoint([planeNormal, scene.position])
+			plane.setFromNormalAndCoplanarPoint(planeNormal, scene.position)
 		})
 		/**
 		 * add environment effects
