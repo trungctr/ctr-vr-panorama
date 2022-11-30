@@ -21,7 +21,24 @@ const html = {
 		/**
 		 * add GUI
 		 */
-
+		const planeGeometry = new THREE.PlaneGeometry(30, 30)
+		const planeMaterial = new THREE.MeshStandardMaterial({
+			color: 0x000000,
+			side: THREE.DoubleSide,
+			transparent: true,
+			opacity: 0.8
+		})
+		const plane = new THREE.Mesh(planeGeometry, planeMaterial)
+		plane.rotation.x = -0.5 * Math.PI
+		scene.add(plane)
+		let mouseCoord = new THREE.Vector2()
+		let planeNormal = new THREE.Vector3()
+		window.addEventListener('mousemove', (e) => {
+			mouseCoord.x = (e.clientX/ window.innerWidth)*2 -1
+			mouseCoord.y = (e.clientY / window.innerHeight) * 2 + 1
+			planeNormal.copy(camera.position).normalize()
+			plane.setFromNormalAndCoplanarPoint([planeNormal, scene.position])
+		})
 		/**
 		 * add environment effects
 		 */
@@ -48,10 +65,6 @@ const html = {
 		document.body.appendChild(renderer.domElement)
 		camera.position.set(0, 0, 0.1)
 		camera.lookAt(0, 0, 0)
-
-		const pointerLocked = {
-			isLocked: false
-		}
 
 		/**
 		 * add xyz axis, x red, y green, z blue
