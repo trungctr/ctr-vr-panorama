@@ -144,8 +144,8 @@
 				<button class="intro ctr-button hide" id="tuts">XEM HƯỚNG DẪN</button>
 			</div>
 		</div>
-		<audio class='hide' src='/ctr-3js-static/asset/voices/F1.m4a' id='SFX-speaker' autoplay></audio>
-		<audio class='hide' src='/ctr-3js-static/asset/voices/Victory-TwoStepsFromHell-BGM.mp3' id='BGM-speaker' autoplay loop></audio>
+		<audio class='hide' src='/ctr-3js-static/asset/voices/F1.m4a' id='SFX-speaker'></audio>
+		<audio class='hide' src='/ctr-3js-static/asset/voices/Victory-TwoStepsFromHell-BGM.mp3' id='BGM-speaker' Autobuffer autoplay loop></audio>
 		<script type='module' src="/ctr-3js-static/js/main.js?v=2022.11.29.1500"></script>
 		<script type='text/javascript'>
 			/**
@@ -174,8 +174,10 @@
 			soundButton2.onclick = () =>
 			{
 				showIntro()
-				sfx.mute()
-				bgm.mute()
+				sfx.pause()
+				bgm.pause()
+				sfx.setAttribute('muted', 'true')
+				bgm.setAttribute('muted', 'true')
 			}
 
 		</script>
