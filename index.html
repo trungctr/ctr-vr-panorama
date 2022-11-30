@@ -41,9 +41,14 @@
 				-ms-transform: translateX(-50%);
 			}
 
-			.intro-buton {
-				/* border-radius: 5px; */
+			.rounded {
+				border-radius: 5px;
+			}
+
+			.ctr-button {
 				border: none;
+				text-align: center center !important;
+				;
 				padding: 5px 20px;
 				margin-top: 10px;
 				color: #ffffff;
@@ -52,10 +57,60 @@
 				width: 200px;
 			}
 
-			.intro-buton:hover {
-				border: 3px solid rgba(255, 255, 255, 1);
+			.sys-note {
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				border: none;
+				padding: 20px;
+				color: #ffffff;
+				background-color: rgba(0, 0, 0, 0.8);
+				width: 364px;
 			}
 
+			.ctr-button:hover {
+				border: 2px solid rgba(255, 255, 255, 1);
+			}
+
+			.lds-ring {
+				display: inline-block;
+				position: relative;
+				width: 30px;
+				height: 30px;
+			}
+
+			.lds-ring div {
+				box-sizing: border-box;
+				display: block;
+				position: absolute;
+				width: 30px;
+				height: 30px;
+				margin: 2px;
+				border: 3px solid #fff;
+				border-radius: 50%;
+				animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+				border-color: #fff transparent transparent transparent;
+			}
+
+			.lds-ring div:nth-child(1) {
+				animation-delay: -0.45s;
+			}
+
+			.lds-ring div:nth-child(2) {
+				animation-delay: -0.3s;
+			}
+
+			.lds-ring div:nth-child(3) {
+				animation-delay: -0.15s;
+			}
+
+			@keyframes lds-ring {
+				0% {
+					transform: rotate(0deg);
+				}
+
+				100% {
+					transform: rotate(360deg);
+				}
+			}
 		</style>
 	</head>
 
@@ -64,17 +119,66 @@
 		<img class="intro" id="intro-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
 			src="/ctr-3js-static/asset/img/bg_intro.jpg">
 		<div id='intro_menu'>
-			<div>
-				<button class="intro intro-buton" id="start-button">LOADING...</button>
+			<div class='' id='confirm-sound'>
+				<div class='sys-note'>
+					MELATEC: Hệ thống sẽ bật âm thanh, nếu bạn thoải mái với điều này hãy chọn chế độ "Bật âm thanh", nếu âm
+					thanh làm phiền đến bạn hoặc những người xung quanh hãy chọn chế độ "Giữ im lặng". Yên tâm, bạn có thể
+					thay đổi cài đặt này trong menu.
+				</div>
+				<div>
+					<button class="intro ctr-button" id="turn-it-on">Bật âm thanh</button>
+					<button class="intro ctr-button" id="keep-silent">Giữ im lặng</button>
+				</div>
 			</div>
 			<div>
-				<button class="intro intro-buton" id="tuts">XEM HƯỚNG DẪN</button>
+				<button class="intro ctr-button hide" id="start-button">
+					<div class="lds-ring">
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
+				</button>
+			</div>
+			<div>
+				<button class="intro ctr-button hide" id="tuts">XEM HƯỚNG DẪN</button>
 			</div>
 		</div>
-		<audio class='hide' src='/ctr-3js-static/asset/voices/F1.m4a' id='SFX-speaker' autoplay></audio>
-		<audio class='hide' src='/ctr-3js-static/asset/voices/Victory-TwoStepsFromHell-BGM.mp3' id='BGM-speaker' autoplay
-			loop></audio>
+		<audio class='hide' src='/asset/voices/F1.m4a' id='SFX-speaker' autoplay></audio>
+		<audio class='hide' src='/asset/voices/Victory-TwoStepsFromHell-BGM.mp3' id='BGM-speaker' autoplay loop></audio>
 		<script type='module' src="/ctr-3js-static/js/main.js?v=2022.11.29.1500"></script>
+		<script type='text/javascript'>
+			/**
+			 * confirm sound play
+			 */
+			let button1 = document.getElementById('start-button')
+			let button2 = document.getElementById('tuts')
+			let bgm = document.getElementById('BGM-speaker')
+			let sfx = document.getElementById('SFX-speaker')
+			let introNote = document.getElementById('confirm-sound')
+			let soundButton = document.getElementById('turn-it-on')
+			let soundButton2 = document.getElementById('keep-silent')
+
+			function showIntro()
+			{
+				button1.classList.remove('hide')
+				button2.classList.remove('hide')
+				introNote.classList.add('hide')
+			}
+			soundButton.onclick = () =>
+			{
+				showIntro()
+				sfx.play()
+				bgm.play()
+			}
+			soundButton2.onclick = () =>
+			{
+				showIntro()
+				sfx.mute()
+				bgm.mute()
+			}
+
+		</script>
 	</body>
 
 </html>

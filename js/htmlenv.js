@@ -52,17 +52,6 @@ const html = {
 		const pointerLocked = {
 			isLocked: false
 		}
-		// renderer.domElement.addEventListener('load', () => {
-		// 	pointerL.lock()
-		// 	pointerLocked.isLocked = true
-		// })
-		// document.addEventListener('click', () => {
-		// 	if (pointerLocked.isLocked == false) {
-		// 		pointerL.lock()
-		// 	} else {
-		// 		pointerL.unlock()
-		// 	}
-		// })
 
 		/**
 		 * add xyz axis, x red, y green, z blue
