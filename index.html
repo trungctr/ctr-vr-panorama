@@ -14,7 +14,7 @@
 			}
 
 			#intro-img {
-				background-image: url('/ctr-3js-static/asset/img/bg_intro.jpg');
+				background-image: url('/asset/img/bg_intro.jpg');
 				background-size: contain;
 				background-repeat: repeat;
 				margin: 0px !important;
@@ -115,10 +115,9 @@
 	</head>
 
 	<body>
-		<iframe src="silence.mp3" allow="autoplay" id="audio" style="display: none"></iframe>
 		<img class="intro" id="intro-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-			src="/ctr-3js-static/asset/img/bg_intro.jpg">
-		<div id='intro_menu'>
+			src="./asset/img/bg_intro.jpg">
+		<div class='' id='intro_menu'>
 			<div class='' id='confirm-sound'>
 				<div class='sys-note'>
 					MELATEC: Hệ thống sẽ bật âm thanh, nếu bạn thoải mái với điều này hãy chọn chế độ "Bật âm thanh", nếu âm
@@ -144,9 +143,9 @@
 				<button class="intro ctr-button hide" id="tuts">XEM HƯỚNG DẪN</button>
 			</div>
 		</div>
-		<audio class='hide' src='/ctr-3js-static/asset/voices/F1.m4a' id='SFX-speaker'></audio>
-		<audio class='hide' src='/ctr-3js-static/asset/voices/Victory-TwoStepsFromHell-BGM.mp3' id='BGM-speaker' Autobuffer autoplay loop></audio>
-		<script type='module' src="/ctr-3js-static/js/main.js?v=2022.11.29.1500"></script>
+		<audio class='hide' src='./asset/voices/F1.m4a' id='SFX-speaker'></audio>
+		<audio class='hide' src='./asset/voices/Victory-TwoStepsFromHell-BGM.mp3' id='BGM-speaker' loop></audio>
+		<script type='module' src="./js/main.js?v=2022.11.29.1500"></script>
 		<script type='text/javascript'>
 			/**
 			 * confirm sound play

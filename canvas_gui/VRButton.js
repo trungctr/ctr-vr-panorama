@@ -6,7 +6,7 @@
 
 class VRButton{
 
-	constructor( renderer, options ) {
+	constructor(renderer, options ) {
         this.renderer = renderer;
         if (options !== undefined){
             this.onSessionStart = options.onSessionStart;
