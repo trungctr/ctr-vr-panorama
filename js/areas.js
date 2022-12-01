@@ -1,5 +1,5 @@
 ﻿// const root = '/ctr-3js-static'
-const root = '..'
+const root = '.'
 const areas = {
 	1: {
 		name: 'Khu nhận mẫu ban đầu',

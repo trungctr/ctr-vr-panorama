@@ -142,7 +142,6 @@ function buildGUI() {
 		let itarget = new THREE.Vector3(0, 0, 0)
 		const oList = raycaster.intersectObjects(scene.children)
 		for (let i = 0; i < oList.length; i++) {
-			console.log(oList[i].object.userData)
 			if (oList[i].object.material.visible === false) {
 				continue
 			} else {
@@ -172,7 +171,6 @@ function buildGUI() {
 		const geometry = new THREE.BufferGeometry().setFromPoints(points)
 		const line = new THREE.Line(geometry, material)
 		scene.add(line)
-		console.log(intersectionPoint, itarget)
 	})
 }
 
