@@ -1,15 +1,15 @@
 ﻿// const root = '/ctr-3js-static'
 const root = '..'
 const devices = {
-	1: {
-		name: 'Khu nhận mẫu ban đầu',
+	M1: {
+		name: 'Machine 1',
 		voice: `${root}/asset/voices/`,
-		text: '',
+		text: 'this is a machine',
 		pos: {
-			x: '',
-			y: '',
-			z: '',
-			r: ''
+			x: 2,
+			y: 1,
+			z: -2,
+			r: 0
 		}
 	}
 }

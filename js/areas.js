@@ -1,113 +1,131 @@
 ﻿// const root = '/ctr-3js-static'
 const root = '.'
 const areas = {
-	1: {
+	A1: {
+		stt: 'start',
 		name: 'Khu nhận mẫu ban đầu',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_1_flip.jpg`,
-		machines: []
+		devices: ['M1']
 	},
-	'3_1': {
+	A2: {
+		stt: '3_1',
 		name: 'Khu vực hệ thống tự động hoàn toàn Roche 1/3',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_3_flip.jpg`,
-		machines: ['1', '2', '3']
+		devices: ['M1', 'M2', 'M3']
 	},
-	'3_2': {
+	A3: {
+		stt: '3_2',
 		name: 'Khu vực hệ thống tự động hoàn toàn Roche 2/3',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_4_flip.jpg`,
-		machines: []
+		devices: []
 	},
-	'3_3': {
+	A4: {
+		stt: '3_3',
 		name: 'Khu vực hệ thống tự động hoàn toàn Roche 3/3',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_5_flip.jpg`,
-		machines: []
+		devices: []
 	},
-	'4_1': {
+	A5: {
+		stt: '4_1',
 		name: 'Khu vực hệ thống tự động toàn Abbott1/2',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_6_flip.jpg`,
-		machines: ['4', '5', '6']
+		devices: ['M4', 'M5', 'M6']
 	},
-	'4_2': {
+	A6: {
+		stt: '4_2',
 		name: 'Khu vực hệ thống tự động toàn Abbott 2/2',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_7_flip.jpg`,
-		machines: []
+		devices: []
 	},
-	5: {
+	A7: {
+		stt: '5',
 		name: 'Khu vực Elisa',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_8_flip.jpg`,
-		machines: ['7']
+		devices: ['M7']
 	},
-	6: {
+	A8: {
+		stt: '6',
 		name: 'Phòng xét nghiệm sinh hóa và cặn nước tiểu',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_9_flip.jpg`,
-		machines: []
+		devices: []
 	},
-	7: {
+	A9: {
+		stt: '7',
 		name: 'Phòng đọc kết quả Tế bào - Giải phẫu bệnh',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_10_flip.jpg`,
-		machines: []
+		devices: []
 	},
-	'8_1': {
+	A10: {
+		stt: '8_1',
 		name: 'Phòng huyết học 1/2',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_11_flip.jpg`,
-		machines: ['8', '9', '10', '11', '12', '13', '14', '15']
+		devices: ['M8', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15']
 	},
-	'8_2': {
+	A11: {
+		stt: '8_2',
 		name: 'Phòng huyết học 2/2',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_12_flip.jpg`,
-		machines: ['8', '9', '10', '11', '12', '13', '14', '15']
+		devices: ['M8', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15']
 	},
-	9: {
+	A12: {
+		stt: '9',
 		name: 'Phòng tách chiết - Sinh học phân tử',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_16_flip.jpg`,
-		machines: []
+		devices: []
 	},
-	10: {
+	A13: {
+		stt: '10',
 		name: 'Phòng PCR - Sinh học phân tử',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_14_flip.jpg`,
-		machines: []
+		devices: []
 	},
-	11: {
+	A14: {
+		stt: '11',
 		name: 'Phòng sau PCR - Sinh học phân tử',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_15_flip.jpg`,
-		machines: ['19', '20']
+		devices: ['M19', 'M20']
 	},
-	12: {
+	A15: {
+		stt: '12',
 		name: 'Phòng tách chiết và giải trình tự GEN - sinh học phân tử',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_18_flip.jpg`,
-		machines: []
+		devices: []
 	},
-	13: {
+	A16: {
+		stt: '13',
 		name: 'Phòng nuôi cấy tế bào, nhiễm sắc thể đồ - sinh học phân tử',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_17_flip.jpg`,
-		machines: []
+		devices: []
 	},
-	14: {
+	A17: {
+		stt: '14',
 		name: 'Phòng vi sinh ký sinh trùng',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_13_flip.jpg`,
-		machines: ['16', '17', '18']
+		devices: ['M16', 'M17', 'M18']
 	},
-	15: {
+	A18: {
+		stt: '15',
 		name: 'Kho lưu mẫu sau phân tích',
 		voice: `${root}/asset/voices/f1_flip.jpg`,
 		img: `${root}/asset/img/scene_13_flip.jpg`,
-		machines: []
+		devices: []
 	}
 }
 

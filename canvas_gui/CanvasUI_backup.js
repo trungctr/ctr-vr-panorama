@@ -50,7 +50,6 @@ class CanvasUI {
 				borderRadius: 6
 			}
 		}
-		//các tham số sẽ được truyền từ config của người dùng qua tham số thứ 2 của hàm CreateUI
 		this.config =
 			config === undefined
 				? defaultconfig
@@ -107,9 +106,6 @@ class CanvasUI {
 		)
 
 		this.mesh = new Mesh(planeGeometry, planeMaterial)
-		//ctr: add user data
-		this.mesh.userData.type = this.config.watcher.split('')[0]
-		this.mesh.userData.name = this.config.watcher
 
 		this.texture = new CanvasTexture(canvas)
 		this.mesh.material.map = this.texture
@@ -497,7 +493,7 @@ class CanvasUI {
 	select(index = 0) {
 		if (this.selectedElements[index] !== undefined) {
 			const elm = this.selectedElements[index]
-			if (elm.onSelect) elm.onSelect(this.config.watcher)
+			if (elm.onSelect) elm.onSelect()
 			if (elm.type === 'input-text') {
 				this.keyboard.mesh.visible = true
 			} else {
@@ -544,10 +540,7 @@ class CanvasUI {
 		const intersects = this.raycaster.intersectObject(this.mesh)
 		const elm = this.selectedElements[index]
 
-		////////////////////////trungctr //////
-
-		if (intersects.length > 0)
-		{
+		if (intersects.length > 0) {
 			if (elm && elm.type === 'slider') {
 				if (this.selectPressed[index]) {
 					this.intersects[index] = intersects[0]
@@ -931,6 +924,4 @@ class CanvasUI {
 }
 
 export { CanvasUI }
-
-
 
