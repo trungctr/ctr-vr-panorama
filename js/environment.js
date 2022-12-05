@@ -262,7 +262,7 @@ function init() {
 	const sphereMaterial = new THREE.MeshStandardMaterial({
 		color: 0xffffff,
 		side: THREE.BackSide,
-		wireframe: false,
+		wireframe: true,
 		map: '',
 		visible: true
 	})
