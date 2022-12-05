@@ -262,7 +262,7 @@ const devices = {
 			x: -1,
 			y: 2,
 			z: -2,
-			r: 0
+			r: 1
 		}
 	}
 }
