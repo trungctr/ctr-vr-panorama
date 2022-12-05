@@ -19,7 +19,7 @@ const crScene = {
 		75,
 		window.innerWidth / window.innerHeight,
 		0.1,
-		10000
+		1000000
 	),
 	textureLoader: new THREE.TextureLoader(),
 	startButton: document.getElementById('start-button'),
@@ -228,7 +228,7 @@ function init() {
 	document.body.appendChild(crScene.renderer.domElement)
 
 	//setup camera
-	crScene.camera.position.set(0, 0, -1)
+	crScene.camera.position.set(0,0, -1)
 	crScene.camera.name = 'Camera'
 	crScene.camera.lookAt(0, 0, 1)
 	crScene.camera.updateMatrixWorld()
@@ -258,7 +258,7 @@ function init() {
 	 * add static models
 	 */
 	// background sphere
-	const sphereGeometry = new THREE.SphereGeometry(0.09, 10, 10)
+	const sphereGeometry = new THREE.SphereGeometry(1000, 100, 100)
 	const sphereMaterial = new THREE.MeshStandardMaterial({
 		color: 0xffffff,
 		side: THREE.BackSide,
@@ -271,7 +271,7 @@ function init() {
 	crScene.img.position.set(0, 0, -1)
 	crScene.img.castShadow = false
 	crScene.scene.add(crScene.img)
-	crScene.img.add(crScene.camera)
+	// crScene.img.add(crScene.camera)
 
 	window.addEventListener('resize', () => {
 		crScene.camera.aspect = window.innerWidth / window.innerHeight
