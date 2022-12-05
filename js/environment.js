@@ -75,11 +75,11 @@ function configScene(w) {
 	const area = Areas[w]
 	crScene.now = area.name
 	crScene.devices = area.devices
-	// crScene.img.material.map = crScene.textureLoader.load(area.img)
-	crScene.textureLoader.load(area.img, (tr) => {
-		tr.mapping = THREE.EquirectangularReflectionMapping
-		crScene.scene.background = tr
-	})
+	crScene.img.material.map = crScene.textureLoader.load(area.img)
+	// crScene.textureLoader.load(area.img, (tr) => {
+	// 	tr.mapping = THREE.EquirectangularReflectionMapping
+	// 	crScene.scene.background = tr
+	// })
 	if (area.devices.length > 0) {
 		for (let i = 0; i < area.devices.length; i++) {
 			addDevices(area.devices[i])
