@@ -12,7 +12,7 @@ const crScene = {
 	devices: {},
 	img: '',
 	mark: () => {},
-	renderer: new THREE.WebGLRenderer(),
+	renderer: new THREE.WebGLRenderer({ antialias:true}),
 	scene: new THREE.Scene(),
 	// crScene.camera parameters: field od view, with/height, near(distance form crScene.camera to near plan) and far (distance form crScene.camera to far plan)
 	camera: new THREE.PerspectiveCamera(
@@ -271,7 +271,7 @@ function init() {
 	crScene.img.position.set(0, 0, 0)
 	crScene.img.castShadow = false
 	crScene.scene.add(crScene.img)
-	configScene('A1')
+	configScene('A6')
 	// crScene.img.add(crScene.camera)
 
 	window.addEventListener('resize', () => {
