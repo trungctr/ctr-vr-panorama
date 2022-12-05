@@ -229,6 +229,7 @@ function init() {
 
 	//setup camera
 	crScene.camera.position.set(0, 0, -1)
+	crScene.camera.name = 'Camera'
 	crScene.camera.lookAt(0, 0, 1)
 	crScene.camera.updateMatrixWorld()
 	crScene.camera.updateProjectionMatrix()
@@ -327,10 +328,9 @@ const ENV = {
 		/**
 		 * setup VR/XR
 		 */
-		
+
 		crScene.renderer.xr.enabled = true
 		crScene.renderer.xr.setReferenceSpaceType('local')
-		
 		const controllerModelFactory = new XRControllerModelFactory()
 
 		// controller
@@ -377,7 +377,6 @@ const ENV = {
 
 		function maintainMethods() {
 			crScene.vrMenu.update()
-			crScene.renderer.xr.getCamera().position.set(0, 0, 0)
 		}
 
 		/**
