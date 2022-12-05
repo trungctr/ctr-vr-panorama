@@ -8,11 +8,11 @@ import Areas from './areas.js'
 import Devices from './devices.js'
 
 const crScene = {
-	now: 'A1',
+	ID: 'A1',
 	devices: {},
 	img: '',
 	mark: () => {},
-	renderer: new THREE.WebGLRenderer({ antialias:true}),
+	renderer: new THREE.WebGLRenderer({ antialias: true }),
 	scene: new THREE.Scene(),
 	// crScene.camera parameters: field od view, with/height, near(distance form crScene.camera to near plan) and far (distance form crScene.camera to far plan)
 	camera: new THREE.PerspectiveCamera(
@@ -32,6 +32,24 @@ function clearBody() {
 	// document.getElementById('tuts').classList.add('hide')
 	document.getElementById('intro_menu').classList.add('hide')
 	document.getElementById('intro-img').classList.add('hide')
+}
+
+function configScene(w) {
+	const area = Areas[w]
+	crScene.ID = w
+	crScene.devices = area.devices
+	// crScene.img.material.map = crScene.textureLoader.load(area.img)
+	crScene.textureLoader.load(area.img, (tr) => {
+		tr.mapping = THREE.EquirectangularReflectionMapping
+		crScene.scene.background = tr
+	})
+	if (crScene.vrMenu) crScene.vrMenu.updateElement('info', area.name)
+	if (area.devices.length > 0) {
+		console.log(area.devices)
+		for (let i = 0; i < area.devices.length; i++) {
+			addDevices(area.devices[i])
+		}
+	}
 }
 
 function mouseSelector() {
@@ -71,22 +89,6 @@ function mouseSelector() {
 	})
 }
 
-function configScene(w) {
-	const area = Areas[w]
-	crScene.now = area.name
-	crScene.devices = area.devices
-	// crScene.img.material.map = crScene.textureLoader.load(area.img)
-	crScene.textureLoader.load(area.img, (tr) => {
-		tr.mapping = THREE.EquirectangularReflectionMapping
-		crScene.scene.background = tr
-	})
-	if (area.devices.length > 0) {
-		for (let i = 0; i < area.devices.length; i++) {
-			addDevices(area.devices[i])
-		}
-	}
-}
-
 function execute(w) {
 	const ext = w.split('')
 	if (ext[0] == 'A') {
@@ -98,60 +100,55 @@ function execute(w) {
 }
 
 function addDevices(m) {
-	const dvc = Devices[m].name
-	const config = {
-		panelSize: { width: 1, height: 0.2 },
-		height: 100,
-		button: {
-			type: 'button',
-			position: { top: 10, left: 10 },
-			width: 480,
-			height: 80,
-			fontColor: '#fff',
-			// backgroundColor: '#000000',
-			hover: '#eee',
-			onSelect: execute
-		},
-		renderer: crScene.renderer,
-		watcher: m
-	}
+	if (Devices[m]) {
+		const dvc = Devices[m].name
+		const config = {
+			panelSize: { width: 1, height: 0.2 },
+			height: 100,
+			button: {
+				type: 'button',
+				position: { top: 10, left: 0 },
+				width: 480,
+				height: 100,
+				fontColor: '#fff',
+				fontSize: 80,
+				// backgroundColor: '#000000',
+				hover: '#eee',
+				onSelect: execute
+			},
+			renderer: crScene.renderer,
+			watcher: m
+		}
 
-	const content = {
-		button: dvc
-	}
+		const content = {
+			button: dvc
+		}
 
-	crScene.devices[dvc] = new CanvasUI(content, config)
-	crScene.devices[dvc].mesh.position.set(
-		Devices[m].pos.x,
-		Devices[m].pos.y,
-		Devices[m].pos.z
-	)
-	crScene.devices[dvc].mesh.name = m
-	crScene.scene.add(crScene.devices[dvc].mesh)
+		crScene.devices[dvc] = new CanvasUI(content, config)
+		crScene.devices[dvc].mesh.position.set(
+			Devices[m].pos.x,
+			Devices[m].pos.y,
+			Devices[m].pos.z
+		)
+		crScene.devices[dvc].mesh.name = m
+		crScene.scene.add(crScene.devices[dvc].mesh)
+	}
 }
 
 function onPrev() {
-	const msg = 'Prev pressed'
-	console.log(msg)
-	crScene.vrMenu.updateElement('info', msg)
-}
-
-function onStop() {
-	const msg = 'Stop pressed'
-	console.log(msg)
-	crScene.vrMenu.updateElement('info', msg)
+	const ext = crScene.ID.split('')
+	const order = Number(ext[1]) - 1
+	if (Number(ext[1]) == 18) order = 18
+	const nextName = 'A' + order
+	configScene(nextName)
 }
 
 function onNext() {
-	const msg = 'Next pressed'
-	console.log(msg)
-	crScene.vrMenu.updateElement('info', msg)
-}
-
-function onContinue(k) {
-	const msg = 'Continue pressed'
-	console.log(msg, k)
-	crScene.vrMenu.updateElement('info', msg)
+	const ext = crScene.ID.split('')
+	const order = Number(ext[1]) + 1
+	if(Number(ext[1]) == 18) order = 1
+	const nextName = 'A' + order
+	configScene(nextName)
 }
 
 function addVrMenu() {
@@ -174,47 +171,27 @@ function addVrMenu() {
 			hover: '#ff0',
 			onSelect: onPrev
 		},
-		stop: {
-			type: 'button',
-			position: { top: 64, left: 64 },
-			width: 64,
-			fontColor: '#bb0',
-			hover: '#ff0',
-			onSelect: onStop
-		},
 		next: {
 			type: 'button',
-			position: { top: 64, left: 128 },
+			position: { top: 64, left: 442 },
 			width: 64,
 			fontColor: '#bb0',
-			hover: '#ff0',
-			onSelect: onNext
-		},
-		continue: {
-			type: 'button',
-			position: { top: 70, right: 10 },
-			width: 200,
-			height: 52,
-			fontColor: '#fff',
-			backgroundColor: '#2659a4',
 			hover: '#3df',
-			onSelect: onContinue
+			onSelect: onNext
 		},
 		renderer: crScene.renderer,
 		watcher: 'M1'
 	}
 
 	const content = {
-		info: '',
+		info: 'Khu nhận mẫu ban đầu',
 		prev: '<path>M 10 32 L 54 10 L 54 54 Z</path>',
-		stop: '<path>M 50 15 L 15 15 L 15 50 L 50 50 Z</path>',
-		next: '<path>M 54 32 L 10 10 L 10 54 Z</path>',
-		continue: 'Continue'
+		next: '<path>M 54 32 L 10 10 L 10 54 Z</path>'
 	}
 
 	crScene.vrMenu = new CanvasUI(content, config)
 
-	crScene.vrMenu.mesh.position.set(0, 1, -3)
+	crScene.vrMenu.mesh.position.set(0, 0.1, -0.2)
 	crScene.scene.add(crScene.vrMenu.mesh)
 }
 
@@ -226,20 +203,20 @@ function init() {
 	crScene.renderer.setSize(window.innerWidth, window.innerHeight)
 	crScene.renderer.shadowMap.enabled = true
 	document.body.appendChild(crScene.renderer.domElement)
-	
+
 	//setup camera
-	crScene.camera.position.set(0,0,0.001)
+	crScene.camera.position.set(0, 0, 1)
 	crScene.camera.name = 'Camera'
-	crScene.camera.lookAt(0, 0, 1)
+	crScene.camera.lookAt(0, 0, 0)
 	crScene.camera.updateMatrixWorld()
 	crScene.camera.updateProjectionMatrix()
-	
+
 	/**
 	 *  light effect setup
 	 */
 	crScene.ambientLight = new THREE.AmbientLight(0xffffff)
 	crScene.scene.add(crScene.ambientLight)
-	
+
 	/**
 	 * add develope helper (for developer)
 	 */
@@ -248,41 +225,41 @@ function init() {
 	axesHelper.setColors(0xff0000, 0x00ff00, 0x0000ff)
 	axesHelper.updateMatrixWorld()
 	crScene.scene.add(axesHelper)
-	
+
 	//grid helper
 	const gridsHelper = new THREE.GridHelper(30, 30)
 	gridsHelper.updateMatrixWorld()
 	crScene.scene.add(gridsHelper)
-	
+
 	/**
 	 * add static models
 	 */
 	// background sphere
-	const sphereGeometry = new THREE.SphereGeometry(1000, 100, 100)
-	const sphereMaterial = new THREE.MeshStandardMaterial({
-		color: 0xffffff,
-		side: THREE.BackSide,
-		wireframe: true,
-		map: '',
-		visible: true
-	})
-	crScene.img = new THREE.Mesh(sphereGeometry, sphereMaterial)
-	crScene.img.name = 'camera locker'
-	crScene.img.position.set(0, 0, 0)
-	crScene.img.castShadow = false
-	crScene.scene.add(crScene.img)
-	configScene('A6')
+	// const sphereGeometry = new THREE.SphereGeometry(1000, 100, 100)
+	// const sphereMaterial = new THREE.MeshStandardMaterial({
+	// 	color: 0xffffff,
+	// 	side: THREE.BackSide,
+	// 	wireframe: true,
+	// 	map: '',
+	// 	visible: false,
+	// })
+	// crScene.img = new THREE.Mesh(sphereGeometry, sphereMaterial)
+	// crScene.img.name = 'camera locker'
+	// crScene.img.position.set(0, 0, 0)
+	// crScene.img.castShadow = false
+	// crScene.scene.add(crScene.img)
 	// crScene.img.add(crScene.camera)
-
+	
 	window.addEventListener('resize', () => {
 		crScene.camera.aspect = window.innerWidth / window.innerHeight
-		crScene.camera.updateProjectionMatrix()
 		crScene.renderer.setSize(window.innerWidth, window.innerHeight)
+		crScene.camera.updateProjectionMatrix()
 	})
-
+	
 	/**
 	 * animation function here
 	 */
+	configScene('A1')
 }
 const ENV = {
 	webGL: () => {
@@ -362,15 +339,16 @@ const ENV = {
 
 		const line = new THREE.Line(geometry)
 		line.name = 'line'
-		line.scale.z = 10
+		line.scale.z = 100
 
 		controller.add(line.clone())
-		controller1.add(line.clone())
+		// controller1.add(line.clone())
 
 		/**
 		 * add GUI
 		 */
 		addVrMenu()
+		controller1.attach(crScene.vrMenu.mesh)
 
 		/**
 		 * Optimized function here
