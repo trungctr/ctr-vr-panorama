@@ -75,10 +75,11 @@ function configScene(w) {
 	const area = Areas[w]
 	crScene.now = area.name
 	crScene.devices = area.devices
-	crScene.textureLoader.load(area.img, (tr) => {
-		tr.mapping = THREE.EquirectangularReflectionMapping
-		crScene.scene.background = tr
-	})
+	crScene.img.material.map = crScene.textureLoader.load(area.img)
+	// crScene.textureLoader.load(area.img, (tr) => {
+	// 	tr.mapping = THREE.EquirectangularReflectionMapping
+	// 	crScene.scene.background = tr
+	// })
 	if (area.devices.length > 0) {
 		for (let i = 0; i < area.devices.length; i++) {
 			addDevices(area.devices[i])
@@ -219,27 +220,26 @@ function addVrMenu() {
 
 function init() {
 	clearBody()
-	configScene('A1')
 	//setup renderer
 	crScene.renderer.setClearColor(0x000)
 	crScene.renderer.setPixelRatio(window.devicePixelRatio)
 	crScene.renderer.setSize(window.innerWidth, window.innerHeight)
 	crScene.renderer.shadowMap.enabled = true
 	document.body.appendChild(crScene.renderer.domElement)
-
+	
 	//setup camera
-	crScene.camera.position.set(0,0, -1)
+	crScene.camera.position.set(0,0,0.001)
 	crScene.camera.name = 'Camera'
 	crScene.camera.lookAt(0, 0, 1)
 	crScene.camera.updateMatrixWorld()
 	crScene.camera.updateProjectionMatrix()
-
+	
 	/**
 	 *  light effect setup
 	 */
 	crScene.ambientLight = new THREE.AmbientLight(0xffffff)
 	crScene.scene.add(crScene.ambientLight)
-
+	
 	/**
 	 * add develope helper (for developer)
 	 */
@@ -248,12 +248,12 @@ function init() {
 	axesHelper.setColors(0xff0000, 0x00ff00, 0x0000ff)
 	axesHelper.updateMatrixWorld()
 	crScene.scene.add(axesHelper)
-
+	
 	//grid helper
 	const gridsHelper = new THREE.GridHelper(30, 30)
 	gridsHelper.updateMatrixWorld()
 	crScene.scene.add(gridsHelper)
-
+	
 	/**
 	 * add static models
 	 */
@@ -264,13 +264,14 @@ function init() {
 		side: THREE.BackSide,
 		wireframe: false,
 		map: '',
-		visible: false
+		visible: true
 	})
 	crScene.img = new THREE.Mesh(sphereGeometry, sphereMaterial)
 	crScene.img.name = 'camera locker'
-	crScene.img.position.set(0, 0, -1)
+	crScene.img.position.set(0, 0, 0)
 	crScene.img.castShadow = false
 	crScene.scene.add(crScene.img)
+	configScene('A1')
 	// crScene.img.add(crScene.camera)
 
 	window.addEventListener('resize', () => {
