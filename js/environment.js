@@ -75,11 +75,11 @@ function configScene(w) {
 	const area = Areas[w]
 	crScene.now = area.name
 	crScene.devices = area.devices
-	crScene.img.material.map = crScene.textureLoader.load(area.img)
-	// crScene.textureLoader.load(area.img, (tr) => {
-	// 	tr.mapping = THREE.EquirectangularReflectionMapping
-	// 	crScene.scene.background = tr
-	// })
+	// crScene.img.material.map = crScene.textureLoader.load(area.img)
+	crScene.textureLoader.load(area.img, (tr) => {
+		tr.mapping = THREE.EquirectangularReflectionMapping
+		crScene.scene.background = tr
+	})
 	if (area.devices.length > 0) {
 		for (let i = 0; i < area.devices.length; i++) {
 			addDevices(area.devices[i])
@@ -133,25 +133,25 @@ function addDevices(m) {
 function onPrev() {
 	const msg = 'Prev pressed'
 	console.log(msg)
-	ui.updateElement('info', msg)
+	crScene.vrMenu.updateElement('info', msg)
 }
 
 function onStop() {
 	const msg = 'Stop pressed'
 	console.log(msg)
-	ui.updateElement('info', msg)
+	crScene.vrMenu.updateElement('info', msg)
 }
 
 function onNext() {
 	const msg = 'Next pressed'
 	console.log(msg)
-	ui.updateElement('info', msg)
+	crScene.vrMenu.updateElement('info', msg)
 }
 
 function onContinue(k) {
 	const msg = 'Continue pressed'
 	console.log(msg, k)
-	ui.updateElement('info', msg)
+	crScene.vrMenu.updateElement('info', msg)
 }
 
 function addVrMenu() {
@@ -262,7 +262,7 @@ function init() {
 	const sphereMaterial = new THREE.MeshStandardMaterial({
 		color: 0xffffff,
 		side: THREE.BackSide,
-		wireframe: false,
+		wireframe: true,
 		map: '',
 		visible: true
 	})
