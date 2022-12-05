@@ -47,7 +47,7 @@ class CanvasUI {
 				padding: 20,
 				backgroundColor: '#000',
 				fontColor: '#fff',
-				borderRadius: 6
+				borderRadius: 0
 			}
 		}
 		//các tham số sẽ được truyền từ config của người dùng qua tham số thứ 2 của hàm CreateUI

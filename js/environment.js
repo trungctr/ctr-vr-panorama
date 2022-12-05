@@ -154,29 +154,61 @@ function onNext() {
 function addVrMenu() {
 	const config = {
 		panelSize: { width: 2, height: 0.5 },
-		height: 128,
+		height: 163,
+		opacity: 1,
 		info: {
 			type: 'text',
-			position: { left: 6, top: 6 },
-			width: 500,
-			height: 58,
-			backgroundColor: '#aaa',
-			fontColor: '#000'
+			position: { left: 0, top: 0 },
+			width: 512,
+			height: 85,
+			backgroundColor: '#000',
+			fontColor: '#fff',
+			fontSize: 25,
+			border: { width: 1, color: '#fff', style: 'solid' },
+		},
+		line: {
+			type: 'text',
+			position: { left: 0, top: 85 },
+			width: 512,
+			height: 2,
+			backgroundColor: '#fff'
 		},
 		prev: {
 			type: 'button',
-			position: { top: 64, left: 0 },
+			position: { top: 92, left: 0 },
 			width: 64,
-			fontColor: '#bb0',
-			hover: '#ff0',
+			fontColor: '#fff',
+			hover: '#2659a4',
 			onSelect: onPrev
+		},
+		mute: {
+			type: 'button',
+			position: { top: 98, left: 72 },
+			width: 175,
+			height: 52,
+			fontColor: '#fff',
+			backgroundColor: '#2659a4',
+			hover: '#bb0',
+			fontSize: 20
+			// onSelect: ''
+		},
+		sound: {
+			type: 'button',
+			position: { top: 98, left: 258 },
+			width: 175,
+			height: 52,
+			fontColor: '#fff',
+			backgroundColor: '#2659a4',
+			hover: '#bb0',
+			fontSize: 20
+			// onSelect: ''
 		},
 		next: {
 			type: 'button',
-			position: { top: 64, left: 442 },
+			position: { top: 92, left: 442 },
 			width: 64,
-			fontColor: '#bb0',
-			hover: '#3df',
+			fontColor: '#fff',
+			hover: '#2659a4',
 			onSelect: onNext
 		},
 		renderer: crScene.renderer,
@@ -185,7 +217,10 @@ function addVrMenu() {
 
 	const content = {
 		info: 'Khu nhận mẫu ban đầu',
+		line: '',
 		prev: '<path>M 10 32 L 54 10 L 54 54 Z</path>',
+		mute: 'Giữ im lặng',
+		sound: 'Bật âm thanh',
 		next: '<path>M 54 32 L 10 10 L 10 54 Z</path>'
 	}
 
