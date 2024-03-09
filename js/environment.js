@@ -427,16 +427,8 @@ const ENV = {
 		/**
 		 * setup VR/XR
 		 */
-		function isOculus() {
-			const toMatch = [/oculus/i, /meta/i]
-			return toMatch.some((toMatchItem) => {
-				return navigator.userAgent.match(toMatchItem)
-			})
-		}
-		console.log(isOculus())
-		if (isOculus()) {
-			currentScene.renderer.xr.enabled = true
-		}
+
+		currentScene.renderer.xr.enabled = true
 		currentScene.renderer.xr.setReferenceSpaceType('local')
 		const controllerModelFactory = new XRControllerModelFactory()
 

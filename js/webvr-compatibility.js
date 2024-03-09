@@ -1,6 +1,12 @@
 import Env from './environment.js'
 class EnvInit {
 	static formatButton(renderer, button) {
+		function isOculus() {
+			const toMatch = [/oculus/i, /meta/i]
+			return toMatch.some((toMatchItem) => {
+				return navigator.userAgent.match(toMatchItem)
+			})
+		}
 		function showEnterVR(/*device*/) {
 			let currentSession = null
 
@@ -14,7 +20,7 @@ class EnvInit {
 
 			function onSessionEnded(/*event*/) {
 				currentSession.removeEventListener('end', onSessionEnded)
-				console.log('VR session started !!')
+				console.log('VR session ended !!')
 				currentSession = null
 			}
 
@@ -73,13 +79,15 @@ class EnvInit {
 			navigator.xr
 				.isSessionSupported('immersive-vr')
 				.then(function (supported) {
-					supported ? showEnterVR() : showWebXRNotFound()
+					const condition = supported && isOculus()
 
-					if (supported && EnvInit.xrSessionIsGranted) {
+					condition ? showEnterVR() : showWebXRNotFound()
+
+					if (condition && EnvInit.xrSessionIsGranted) {
 						button.click()
 					}
 				})
-				.catch(showVRNotAllowed)
+				.catch((e)=>showVRNotAllowed())
 
 			return button
 		} else {
@@ -122,4 +130,5 @@ class EnvInit {
 EnvInit.registerSessionGrantedListener()
 
 export { EnvInit }
+
 
