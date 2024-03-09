@@ -21,7 +21,15 @@ class EnvInit {
 			button.style.backgroundColor = 'rgba(0,200,0,0.8)'
 			button.textContent = 'BẮT ĐẦU THAM QUAN'
 			button.onclick = function () {
-				if (currentSession === null) {
+									function isOculus() {
+										const toMatch = [/oculus/i, /meta/i]
+										return toMatch.some((toMatchItem) => {
+											return navigator.userAgent.match(toMatchItem)
+										})
+									}
+									if (isOculus()) {
+									}
+				if (currentSession === null && isOculus()) {
 					// WebXR's requestReferenceSpace only works if the corresponding feature
 					// was requested at session creation time. For simplicity, just ask for
 					// the interesting ones as optional features, but be aware that the
@@ -122,6 +130,8 @@ class EnvInit {
 EnvInit.registerSessionGrantedListener()
 
 export { EnvInit }
+
+
 
 
 

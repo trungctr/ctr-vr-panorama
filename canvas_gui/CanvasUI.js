@@ -497,7 +497,11 @@ class CanvasUI {
 	select(index = 0) {
 		if (this.selectedElements[index] !== undefined) {
 			const elm = this.selectedElements[index]
-			if (elm.onSelect) elm.onSelect(this.config.watcher)
+			if (elm.onSelect)
+			{
+				elm.onSelect(this.config.watcher)
+				console.log('selected',elm,';;', this.config.watcher )
+			}
 			if (elm.type === 'input-text') {
 				this.keyboard.mesh.visible = true
 			} else {
@@ -545,9 +549,10 @@ class CanvasUI {
 		const elm = this.selectedElements[index]
 
 		////////////////////////trungctr //////
-
+		
 		if (intersects.length > 0)
 		{
+			// console.log('controller clicked')
 			if (elm && elm.type === 'slider') {
 				if (this.selectPressed[index]) {
 					this.intersects[index] = intersects[0]
@@ -585,7 +590,7 @@ class CanvasUI {
 			: '#000'
 		const fontFamily = this.config.body.fontFamily
 			? this.config.body.fontFamily
-			: 'Arial'
+			: 'Arial Narrow'
 		const fontColor = this.config.body.fontColor
 			? this.config.body.fontColor
 			: '#fff'
@@ -931,6 +936,7 @@ class CanvasUI {
 }
 
 export { CanvasUI }
+
 
 
 

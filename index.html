@@ -112,6 +112,17 @@
 				}
 			}
 
+			#main_menu {
+				position: absolute;
+				bottom: 10%;
+				left: 50%;
+				transform: translateX(-50%);
+				-moz-transform: translateX(-50%);
+				-webkit-transform: translateX(-50%);
+				-o-transform: translateX(-50%);
+				-ms-transform: translateX(-50%);
+			}
+
 		</style>
 	</head>
 
@@ -144,6 +155,12 @@
 				<button class="intro ctr-button hide" id="tuts">XEM HƯỚNG DẪN</button>
 			</div>
 		</div>
+		<div class='hide' id='main_menu'>
+			<div>
+				<button class="intro ctr-button" id="pev_but">Prev</button>
+				<button class="intro ctr-button" id="next_but">next</button>
+			</div>
+		</div>
 		<audio class='hide' src='./asset/voices/F1.m4a' id='SFX-speaker'></audio>
 		<audio class='hide' src='./asset/voices/Victory-TwoStepsFromHell-BGM.mp3' id='BGM-speaker' loop></audio>
 		<script type='module' src="./js/main.js?v=2022.11.29.1500"></script>
@@ -170,14 +187,15 @@
 				showIntro()
 				sfx.play()
 				bgm.play()
+				bgm.volume = 0.4
 			}
 			soundButton2.onclick = () =>
 			{
 				showIntro()
 				sfx.pause()
 				bgm.pause()
-				sfx.setAttribute('muted', 'true')
-				bgm.setAttribute('muted', 'true')
+				sfx.volume = 0
+				bgm.volume = 0
 			}
 
 		</script>
