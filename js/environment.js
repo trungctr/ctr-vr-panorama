@@ -85,7 +85,7 @@ function handleDevices(m) {
 				// backgroundColor: '#fff',
 				fontSize: 45,
 				textAlign: 'left',
-				hover: '#bb0',
+				hover: '#bb0'
 				// onSelect: execute
 			},
 			renderer: currentScene.renderer,
@@ -102,7 +102,8 @@ function handleDevices(m) {
 			Devices[m].pos.y,
 			Devices[m].pos.z
 		)
-		currentScene.devices[m].mesh.rotation.y = (Devices[m].pos.r / 180) * Math.PI
+		currentScene.devices[m].mesh.rotation.y =
+			(Devices[m].pos.r / 180) * Math.PI
 		currentScene.devices[m].mesh.name = m
 		currentScene.devices[m].mesh.scale.set(300, 300, 300)
 		currentScene.scene.add(currentScene.devices[m].mesh)
@@ -115,8 +116,13 @@ function mouseSelector() {
 	currentScene.renderer.domElement.addEventListener('click', function (e) {
 		currentScene.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
 		currentScene.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1
-		currentScene.raycaster.setFromCamera(currentScene.mouse, currentScene.camera)
-		const oList = currentScene.raycaster.intersectObjects(currentScene.scene.children)
+		currentScene.raycaster.setFromCamera(
+			currentScene.mouse,
+			currentScene.camera
+		)
+		const oList = currentScene.raycaster.intersectObjects(
+			currentScene.scene.children
+		)
 		for (let i = 0; i < oList.length; i++) {
 			if (oList[i].object.material.visible === false) {
 				continue
@@ -421,8 +427,16 @@ const ENV = {
 		/**
 		 * setup VR/XR
 		 */
-
-		currentScene.renderer.xr.enabled = true
+		function isOculus() {
+			const toMatch = [/oculus/i, /meta/i]
+			return toMatch.some((toMatchItem) => {
+				return navigator.userAgent.match(toMatchItem)
+			})
+		}
+		console.log(isOculus())
+		if (isOculus()) {
+			currentScene.renderer.xr.enabled = true
+		}
 		currentScene.renderer.xr.setReferenceSpaceType('local')
 		const controllerModelFactory = new XRControllerModelFactory()
 
