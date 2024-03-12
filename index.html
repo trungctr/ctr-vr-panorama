@@ -123,11 +123,24 @@
 				-ms-transform: translateX(-50%);
 			}
 
+			.console {
+				position: fixed;
+				bottom: 0;
+				width: 100%;
+				height: 25vh;
+				z-index: 999;
+				background-color: black;
+				color: beige;
+				padding: 15px;
+				text-align: left;
+			}
+
 		</style>
 	</head>
 
 	<body>
-		<img class="intro hide" id="intro-img" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover;"
+		<img class="intro hide" id="intro-img"
+			style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover;"
 			src="./asset/img/bg_intro.jpg">
 		<div class='hide' id='intro_menu'>
 			<div class='' id='confirm-sound'>
@@ -161,6 +174,7 @@
 				<button class="intro ctr-button" id="next_but">next</button>
 			</div>
 		</div>
+		<div class='console' id='console'></div>
 		<audio class='hide' src='./asset/voices/F1.m4a' id='SFX-speaker'></audio>
 		<audio class='hide' src='./asset/voices/Victory-TwoStepsFromHell-BGM.mp3' id='BGM-speaker' loop></audio>
 		<script type='module' src="./js/main.js?v=2022.11.29.1500"></script>

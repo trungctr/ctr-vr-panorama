@@ -9,11 +9,17 @@ import { EnvInit } from './webvr-compatibility.js'
 import { Areas, Devices } from './data.js'
 
 const GLOBAL_ENV = {
-	device: 'unknown',
+	device: 'Unknown',
 	webGLcompatibility: false,
 	developing: true,
 	moveSpeed: 0.5,
 	devicesHovered: true
+}
+
+function devLog(message) {
+	if (GLOBAL_ENV.developing) {
+		document.getElementById('console').innerHTML += message + '<br>'
+	}
 }
 /**
  * Hàm này để kiểm tra tương thích webGL và thiết bị
@@ -51,7 +57,6 @@ const GLOBAL_ENV = {
 		})
 	}
 	GLOBAL_ENV.device = detectMob()
-	console.log(GLOBAL_ENV.device)
 })()
 
 class App {
@@ -152,13 +157,9 @@ class App {
 		App.trackGroup.add(App.refSphere)
 
 		// add sprite labels
-
-		console.log(Areas)
-		console.log(Devices)
 		let deviceList = Areas.A_3.devices
 		let deviceInfo = Devices
 		let deviceArray = Object.keys(deviceList)
-		console.log(deviceArray)
 		for (let i = 0; i < deviceArray.length; i++) {
 			var canvas = document.createElement('canvas'),
 				context = canvas.getContext('2d'),
@@ -232,7 +233,6 @@ class App {
 			App.trackGroup.add(sprite)
 		}
 
-		console.log(App.trackGroup.children)
 		App.scene.add(App.trackGroup)
 		/*
 		 * tạo trình kết xuất bằng webGL
@@ -258,46 +258,48 @@ class App {
 		/**
 		 * setup VR/XR
 		 */
-		if (GLOBAL_ENV.device === 'Oculus' && GLOBAL_ENV.webGLcompatibility) {
-			; (function showEnterVR(/*device*/) {
-				let currentSession = null
+		devLog(GLOBAL_ENV.device)
+		if (
+			(GLOBAL_ENV.device === 'Oculus' || GLOBAL_ENV.device === 'oculus') &&
+			GLOBAL_ENV.webGLcompatibility
+		) {
+			let currentSession = null
+			devLog(GLOBAL_ENV.device)
+			async function onSessionStarted(session) {
+				session.addEventListener('end', onSessionEnded)
 
-				async function onSessionStarted(session) {
-					session.addEventListener('end', onSessionEnded)
+				await renderer.xr.setSession(session)
+				devLog('VR session started !!')
+				currentSession = session
+			}
 
-					await renderer.xr.setSession(session)
-					console.log('VR session started !!')
-					currentSession = session
+			function onSessionEnded(/*event*/) {
+				currentSession.removeEventListener('end', onSessionEnded)
+				devLog('VR session ended !!')
+				currentSession = null
+			}
+
+			if (currentSession === null) {
+				// WebXR's requestReferenceSpace only works if the corresponding feature
+				// was requested at session creation time. For simplicity, just ask for
+				// the interesting ones as optional features, but be aware that the
+				// requestReferenceSpace call will fail if it turns out to be unavailable.
+				// ('local' is always available for immersive sessions and doesn't need to
+				// be requested separately.)
+				const sessionInit = {
+					optionalFeatures: [
+						'local-floor',
+						'bounded-floor',
+						'hand-tracking',
+						'layers'
+					]
 				}
-
-				function onSessionEnded(/*event*/) {
-					currentSession.removeEventListener('end', onSessionEnded)
-					console.log('VR session ended !!')
-					currentSession = null
-				}
-
-				if (currentSession === null) {
-					// WebXR's requestReferenceSpace only works if the corresponding feature
-					// was requested at session creation time. For simplicity, just ask for
-					// the interesting ones as optional features, but be aware that the
-					// requestReferenceSpace call will fail if it turns out to be unavailable.
-					// ('local' is always available for immersive sessions and doesn't need to
-					// be requested separately.)
-					const sessionInit = {
-						optionalFeatures: [
-							'local-floor',
-							'bounded-floor',
-							'hand-tracking',
-							'layers'
-						]
-					}
-					navigator.xr
-						.requestSession('immersive-vr', sessionInit)
-						.then(onSessionStarted)
-				} else {
-					currentSession.end()
-				}
-			})()
+				navigator.xr
+					.requestSession('immersive-vr', sessionInit)
+					.then(onSessionStarted)
+			} else {
+				currentSession.end()
+			}
 			App.renderer.xr.enabled = true
 			App.renderer.xr.setReferenceSpaceType('local')
 			const controllerModelFactory = new XRControllerModelFactory()
@@ -370,30 +372,23 @@ class App {
 
 	render() {
 		document.onkeydown = (e) => {
-			console.log(e.code)
 			switch (e.code) {
 				case 'KeyW' || 'ArrowUp':
-					console.log(e.code, 'move forward')
 					App.camera.translateZ(-GLOBAL_ENV.moveSpeed)
 					break
 				case 'KeyS' || 'ArrowDown':
-					console.log(e.code, 'move backward')
 					App.camera.translateZ(GLOBAL_ENV.moveSpeed)
 					break
 				case 'KeyD' || 'ArrowRight':
-					console.log(e.code, 'move rightward')
 					App.camera.translateX(GLOBAL_ENV.moveSpeed)
 					break
 				case 'KeyA' || 'ArrowLeft':
-					console.log(e.code, 'move leftward')
 					App.camera.translateX(-GLOBAL_ENV.moveSpeed)
 					break
 				case 'Space':
-					console.log(e.code, 'move upward')
 					App.camera.translateY(GLOBAL_ENV.moveSpeed)
 					break
 				case 'ControlLeft' || 'ControlRight':
-					console.log(e.code, 'move leftward')
 					App.camera.translateY(-GLOBAL_ENV.moveSpeed)
 					break
 				default:
