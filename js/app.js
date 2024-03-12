@@ -9,6 +9,7 @@ import { EnvInit } from './webvr-compatibility.js'
 import { Areas, Devices } from './data.js'
 
 const GLOBAL_ENV = {
+	version: '12.03.24.1805',
 	device: 'Unknown',
 	webGLcompatibility: false,
 	developing: true,
@@ -260,7 +261,10 @@ class App {
 		 * setup VR/XR
 		 */
 
-		if (GLOBAL_ENV.device && GLOBAL_ENV.webGLcompatibility) {
+		if (GLOBAL_ENV.device && GLOBAL_ENV.webGLcompatibility)
+		{
+			App.renderer.xr.enabled = true
+			App.renderer.xr.setReferenceSpaceType('local')
 			let currentSession = null
 			devLog(GLOBAL_ENV.device)
 			async function onSessionStarted(session) {
@@ -277,7 +281,8 @@ class App {
 				currentSession = null
 			}
 
-			if (currentSession === null) {
+			if (currentSession === null)
+			{
 				// WebXR's requestReferenceSpace only works if the corresponding feature
 				// was requested at session creation time. For simplicity, just ask for
 				// the interesting ones as optional features, but be aware that the
@@ -295,11 +300,11 @@ class App {
 				navigator.xr
 					.requestSession('immersive-vr', sessionInit)
 					.then(onSessionStarted(currentSession))
-			} else {
+			} else
+			{
 				currentSession.end()
 			}
-			App.renderer.xr.enabled = true
-			App.renderer.xr.setReferenceSpaceType('local')
+			
 			const controllerModelFactory = new XRControllerModelFactory()
 
 			// controller
@@ -335,17 +340,18 @@ class App {
 			controller.add(line.clone())
 			controller1.add(line.clone())
 		}
-
-		//hàm điều khiển camera
-		App.controls = new OrbitControls(App.camera, App.renderer.domElement)
-		// App.clock = new THREE.Clock()
-		App.controls.target.set(
-			App.refSphere.position.x,
-			App.refSphere.position.y,
-			App.refSphere.position.z
-		)
-		App.controls.update()
-
+		else
+		{
+			//hàm điều khiển camera
+			App.controls = new OrbitControls(App.camera, App.renderer.domElement)
+			// App.clock = new THREE.Clock()
+			App.controls.target.set(
+				App.refSphere.position.x,
+				App.refSphere.position.y,
+				App.refSphere.position.z
+			)
+			App.controls.update()
+		}
 		function checkApp(App) {
 			const geometry = new THREE.BoxGeometry(1, 1, 1)
 			// const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
