@@ -1,5 +1,7 @@
 import {
 	Mesh,
+	SpriteMaterial,
+	Sprite,
 	CanvasTexture,
 	MeshBasicMaterial,
 	PlaneGeometry,
@@ -106,11 +108,14 @@ class CanvasUI {
 			this.panelSize.height
 		)
 
-		this.mesh = new Mesh(planeGeometry, planeMaterial)
+		// this.mesh = new Mesh(planeGeometry, planeMaterial)
+		this.mesh = new THREE.Sprite(planeGeometry, planeMaterial)
 		//ctr: add user data
 		this.mesh.userData.type = this.config.watcher.split('')[0]
 		this.mesh.userData.name = this.config.watcher
-
+		
+		// spriteTL.center.set(0.0, 0.0)
+		spriteTL.scale.set(width, height, 1)
 		this.texture = new CanvasTexture(canvas)
 		this.mesh.material.map = this.texture
 
@@ -936,6 +941,9 @@ class CanvasUI {
 }
 
 export { CanvasUI }
+
+
+
 
 
 

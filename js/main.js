@@ -1,9 +1,11 @@
-﻿import Env from './environment.js'
+﻿import App from './app.js'
 import WebGL from './webgl-compatibility.js'
 
-if (WebGL.isWebGLAvailable())
-{
-	Env.START()
+if (WebGL.isWebGLAvailable()) {
+    document.addEventListener('DOMContentLoaded', function () {
+			const app = new App()
+			window.app = app
+		})
 } else {
 	const warning = WebGLcheck.getWebGLErrorMessage()
 	document.getElementById('start-button').style.background =

@@ -1,4 +1,4 @@
-import Env from './environment.js'
+import App from './app.js'
 class EnvInit {
 	static formatButton(renderer, button) {
 		function isOculus() {
@@ -56,7 +56,7 @@ class EnvInit {
 			button.style.background = 'rgba(0,0,255,0.8)'
 			button.textContent = 'BẮT ĐẦU THAM QUAN'
 			button.onclick = () => {
-				Env.webGL()
+				App.webGL()
 			}
 			console.log('Using WebGL')
 		}
@@ -87,7 +87,7 @@ class EnvInit {
 						button.click()
 					}
 				})
-				.catch((e)=>showVRNotAllowed())
+				.catch((e) => showVRNotAllowed())
 
 			return button
 		} else {
@@ -130,5 +130,4 @@ class EnvInit {
 EnvInit.registerSessionGrantedListener()
 
 export { EnvInit }
-
 
