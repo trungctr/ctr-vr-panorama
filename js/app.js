@@ -9,7 +9,7 @@ import { EnvInit } from './webvr-compatibility.js'
 import { Areas, Devices } from './data.js'
 
 const GLOBAL_ENV = {
-	version: '12.03.24.1859',
+	version: '12.03.24.1927',
 	device: 'Unknown',
 	webGLcompatibility: false,
 	developing: true,
@@ -19,7 +19,7 @@ const GLOBAL_ENV = {
 
 function devLog(message) {
 	if (GLOBAL_ENV.developing) {
-		document.getElementById('console').innerHTML += message + '<br>'
+		document.getElementById('console').innerHTML += String(message) + '<br>'
 	}
 }
 /**
@@ -272,9 +272,45 @@ class App {
 				session.addEventListener('end', onSessionEnded)
 				await renderer.xr.setSession(session)
 				currentSession = session
+
+				////////////////////////////////
+				const controllerModelFactory = new XRControllerModelFactory()
+
+				// controller
+				App.controller = App.renderer.xr.getController(0)
+				App.scene.add(App.controller)
+
+				App.controllerGrip = App.renderer.xr.getControllerGrip(0)
+				App.controllerGrip.add(
+					controllerModelFactory.createControllerModel(controllerGrip)
+				)
+				App.scene.add(App.controllerGrip)
+
+				// controller
+				App.controller1 = App.renderer.xr.getController(1)
+				App.scene.add(App.controller1)
+
+				App.controllerGrip1 = App.renderer.xr.getControllerGrip(1)
+				App.controllerGrip1.add(
+					controllerModelFactory.createControllerModel(App.controllerGrip1)
+				)
+				App.scene.add(App.controllerGrip1)
+
+				//pointer linear
+				const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+					new THREE.Vector3(0, 0, 0),
+					new THREE.Vector3(0, 0, -1)
+				])
+
+				const line = new THREE.Line(lineGeometry)
+				line.name = 'selectorLine'
+				line.scale.z = 100
+
+				App.controller.add(line.clone())
+				App.controller1.add(line.clone())
 			}
 
-			// currentSession.removeEventListener('end', onSessionEnded)
+			currentSession.removeEventListener('end', onSessionEnded)
 			let button = document.getElementById('start-button')
 			button.innerHTML = 'start VR'
 			button.onclick = function () {
@@ -294,52 +330,17 @@ class App {
 					currentSession.end()
 				}
 			}
-			////////////////////////////////
-			const controllerModelFactory = new XRControllerModelFactory()
-
-			// controller
-			App.controller = App.renderer.xr.getController(0)
-			App.scene.add(App.controller)
-
-			App.controllerGrip = App.renderer.xr.getControllerGrip(0)
-			App.controllerGrip.add(
-				controllerModelFactory.createControllerModel(controllerGrip)
-			)
-			App.scene.add(App.controllerGrip)
-
-			// controller
-			App.controller1 = App.renderer.xr.getController(1)
-			App.scene.add(App.controller1)
-
-			App.controllerGrip1 = App.renderer.xr.getControllerGrip(1)
-			App.controllerGrip1.add(
-				controllerModelFactory.createControllerModel(App.controllerGrip1)
-			)
-			App.scene.add(App.controllerGrip1)
-
-			//pointer linear
-			const lineGeometry = new THREE.BufferGeometry().setFromPoints([
-				new THREE.Vector3(0, 0, 0),
-				new THREE.Vector3(0, 0, -1)
-			])
-
-			const line = new THREE.Line(lineGeometry)
-			line.name = 'selectorLine'
-			line.scale.z = 100
-
-			App.controller.add(line.clone())
-			App.controller1.add(line.clone())
-		} else {
-			//hàm điều khiển camera
-			App.controls = new OrbitControls(App.camera, App.renderer.domElement)
-			// App.clock = new THREE.Clock()
-			App.controls.target.set(
-				App.refSphere.position.x,
-				App.refSphere.position.y,
-				App.refSphere.position.z
-			)
-			App.controls.update()
+			
 		}
+		//hàm điều khiển camera
+		App.controls = new OrbitControls(App.camera, App.renderer.domElement)
+		// App.clock = new THREE.Clock()
+		App.controls.target.set(
+			App.refSphere.position.x,
+			App.refSphere.position.y,
+			App.refSphere.position.z
+		)
+		App.controls.update()
 		function checkApp(App) {
 			const geometry = new THREE.BoxGeometry(1, 1, 1)
 			// const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
