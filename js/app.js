@@ -9,7 +9,7 @@ import { EnvInit } from './webvr-compatibility.js'
 import { Areas, Devices } from './data.js'
 
 const GLOBAL_ENV = {
-	version: '12.03.24.1805',
+	version: '12.03.24.1837',
 	device: 'Unknown',
 	webGLcompatibility: false,
 	developing: true,
@@ -262,34 +262,22 @@ class App {
 		 * setup VR/XR
 		 */
 
-		if (GLOBAL_ENV.device && GLOBAL_ENV.webGLcompatibility)
-		{
+		if (GLOBAL_ENV.device && GLOBAL_ENV.webGLcompatibility) {
 			App.renderer.xr.enabled = true
 			App.renderer.xr.setReferenceSpaceType('local')
+
 			let currentSession = null
-			devLog(GLOBAL_ENV.device)
+			////////////////////////////////
 			async function onSessionStarted(session) {
 				session.addEventListener('end', onSessionEnded)
-
 				await renderer.xr.setSession(session)
-				devLog('VR session started !!')
 				currentSession = session
 			}
 
-			function onSessionEnded(/*event*/) {
-				currentSession.removeEventListener('end', onSessionEnded)
-				devLog('VR session ended !!')
-				currentSession = null
-			}
+			// currentSession.removeEventListener('end', onSessionEnded)
 
-			if (currentSession === null)
-			{
-				// WebXR's requestReferenceSpace only works if the corresponding feature
-				// was requested at session creation time. For simplicity, just ask for
-				// the interesting ones as optional features, but be aware that the
-				// requestReferenceSpace call will fail if it turns out to be unavailable.
-				// ('local' is always available for immersive sessions and doesn't need to
-				// be requested separately.)
+			// button.onclick = function () {
+			if (currentSession === null) {
 				const sessionInit = {
 					optionalFeatures: [
 						'local-floor',
@@ -300,20 +288,20 @@ class App {
 				}
 				navigator.xr
 					.requestSession('immersive-vr', sessionInit)
-					.then(onSessionStarted(currentSession))
-			} else
-			{
+					.then(onSessionStarted)
+			} else {
 				currentSession.end()
 			}
-			
+			// }
+			////////////////////////////////
 			const controllerModelFactory = new XRControllerModelFactory()
 
 			// controller
 			App.controller = App.renderer.xr.getController(0)
 			App.scene.add(App.controller)
 
-			const controllerGrip = App.renderer.xr.getControllerGrip(0)
-			controllerGrip.add(
+			App.controllerGrip = App.renderer.xr.getControllerGrip(0)
+			App.controllerGrip.add(
 				controllerModelFactory.createControllerModel(controllerGrip)
 			)
 			App.scene.add(App.controllerGrip)
@@ -323,7 +311,7 @@ class App {
 			App.scene.add(App.controller1)
 
 			App.controllerGrip1 = App.renderer.xr.getControllerGrip(1)
-			controllerGrip1.add(
+			App.controllerGrip1.add(
 				controllerModelFactory.createControllerModel(App.controllerGrip1)
 			)
 			App.scene.add(App.controllerGrip1)
@@ -338,11 +326,9 @@ class App {
 			line.name = 'selectorLine'
 			line.scale.z = 100
 
-			controller.add(line.clone())
-			controller1.add(line.clone())
-		}
-		else
-		{
+			App.controller.add(line.clone())
+			App.controller1.add(line.clone())
+		} else {
 			//hàm điều khiển camera
 			App.controls = new OrbitControls(App.camera, App.renderer.domElement)
 			// App.clock = new THREE.Clock()
