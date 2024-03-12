@@ -59,6 +59,7 @@ function devLog(message) {
 	}
 	GLOBAL_ENV.device = isOculus()
 	devLog('0.isOculus = ' + GLOBAL_ENV.device)
+	devLog('1.Version = ' + GLOBAL_ENV.version)
 })()
 
 class App {
