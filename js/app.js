@@ -294,7 +294,7 @@ class App {
 				}
 				navigator.xr
 					.requestSession('immersive-vr', sessionInit)
-					.then(onSessionStarted)
+					.then(onSessionStarted(currentSession))
 			} else {
 				currentSession.end()
 			}
