@@ -134,11 +134,25 @@
 				padding: 15px;
 				text-align: left;
 			}
-
+			#start-button{
+				position: fixed;
+				top: 0;
+				left: 0;
+			}
 		</style>
 	</head>
 
 	<body>
+		<div>
+			<button class="intro ctr-button" id="start-button">
+				<div class="lds-ring">
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+				</div>
+			</button>
+		</div>
 		<img class="intro hide" id="intro-img"
 			style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover;"
 			src="./asset/img/bg_intro.jpg">
@@ -155,7 +169,7 @@
 				</div>
 			</div>
 			<div>
-				<button class="intro ctr-button hide" id="start-button">
+				<button class="intro ctr-button" id="start-button2">
 					<div class="lds-ring">
 						<div></div>
 						<div></div>

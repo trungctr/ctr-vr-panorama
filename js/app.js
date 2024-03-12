@@ -9,7 +9,7 @@ import { EnvInit } from './webvr-compatibility.js'
 import { Areas, Devices } from './data.js'
 
 const GLOBAL_ENV = {
-	version: '12.03.24.1837',
+	version: '12.03.24.1859',
 	device: 'Unknown',
 	webGLcompatibility: false,
 	developing: true,
@@ -275,24 +275,25 @@ class App {
 			}
 
 			// currentSession.removeEventListener('end', onSessionEnded)
-
-			// button.onclick = function () {
-			if (currentSession === null) {
-				const sessionInit = {
-					optionalFeatures: [
-						'local-floor',
-						'bounded-floor',
-						'hand-tracking',
-						'layers'
-					]
+			let button = document.getElementById('start-button')
+			button.innerHTML = 'start VR'
+			button.onclick = function () {
+				if (currentSession === null) {
+					const sessionInit = {
+						optionalFeatures: [
+							'local-floor',
+							'bounded-floor',
+							'hand-tracking',
+							'layers'
+						]
+					}
+					navigator.xr
+						.requestSession('immersive-vr', sessionInit)
+						.then(onSessionStarted)
+				} else {
+					currentSession.end()
 				}
-				navigator.xr
-					.requestSession('immersive-vr', sessionInit)
-					.then(onSessionStarted)
-			} else {
-				currentSession.end()
 			}
-			// }
 			////////////////////////////////
 			const controllerModelFactory = new XRControllerModelFactory()
 
