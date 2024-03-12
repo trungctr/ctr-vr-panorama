@@ -45,17 +45,7 @@ const GLOBAL_ENV = {
 	}
 
 	function detectMob() {
-		const toMatch = [
-			/Android/i,
-			/webOS/i,
-			/iPhone/i,
-			/iPad/i,
-			/iPod/i,
-			/BlackBerry/i,
-			/Windows Phone/i,
-			/oculus/i,
-			/meta/i
-		]
+		const toMatch = [/oculus/i, /meta/i]
 		return toMatch.some((toMatchItem) => {
 			return navigator.userAgent.match(toMatchItem)
 		})
@@ -269,6 +259,45 @@ class App {
 		 * setup VR/XR
 		 */
 		if (GLOBAL_ENV.device === 'Oculus' && GLOBAL_ENV.webGLcompatibility) {
+			; (function showEnterVR(/*device*/) {
+				let currentSession = null
+
+				async function onSessionStarted(session) {
+					session.addEventListener('end', onSessionEnded)
+
+					await renderer.xr.setSession(session)
+					console.log('VR session started !!')
+					currentSession = session
+				}
+
+				function onSessionEnded(/*event*/) {
+					currentSession.removeEventListener('end', onSessionEnded)
+					console.log('VR session ended !!')
+					currentSession = null
+				}
+
+				if (currentSession === null) {
+					// WebXR's requestReferenceSpace only works if the corresponding feature
+					// was requested at session creation time. For simplicity, just ask for
+					// the interesting ones as optional features, but be aware that the
+					// requestReferenceSpace call will fail if it turns out to be unavailable.
+					// ('local' is always available for immersive sessions and doesn't need to
+					// be requested separately.)
+					const sessionInit = {
+						optionalFeatures: [
+							'local-floor',
+							'bounded-floor',
+							'hand-tracking',
+							'layers'
+						]
+					}
+					navigator.xr
+						.requestSession('immersive-vr', sessionInit)
+						.then(onSessionStarted)
+				} else {
+					currentSession.end()
+				}
+			})()
 			App.renderer.xr.enabled = true
 			App.renderer.xr.setReferenceSpaceType('local')
 			const controllerModelFactory = new XRControllerModelFactory()
