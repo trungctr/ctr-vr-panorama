@@ -1,5 +1,5 @@
 ﻿// const root = '/ctr-3js-static'
-const root = '..'
+const root = '.'
 export const Areas = {
 	A_1: {
 		stt: 'start',
