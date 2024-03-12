@@ -12,7 +12,7 @@ import {
 	Vector3,
 	IcosahedronBufferGeometry,
 	Color
-} from '../thre146/build/three.module.js'
+} from '../three146/build/three.module.js'
 
 import { CanvasKeyboard } from './CanvasKeyboard.js'
 import { CanvasColorPicker } from './CanvasColorPicker.js'
