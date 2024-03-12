@@ -1,7 +1,7 @@
-﻿import * as THREE from '../3js/build/three.module.js'
-import { OrbitControls } from '../3js/examples/jsm/controls/OrbitControls.js'
-import { RGBELoader } from '../3js/examples/jsm/loaders/RGBELoader.js'
-import { XRControllerModelFactory } from '../3js/examples/jsm/webxr/XRControllerModelFactory.js'
+﻿import * as THREE from '../thre146/build/three.module.js'
+import { OrbitControls } from '../thre146/examples/jsm/controls/OrbitControls.js'
+import { RGBELoader } from '../thre146/examples/jsm/loaders/RGBELoader.js'
+import { XRControllerModelFactory } from '../thre146/examples/jsm/webxr/XRControllerModelFactory.js'
 import { CanvasUI } from '../canvas_gui/CanvasUI.js'
 import { EnvInit } from './webvr-compatibility.js'
 import Areas from './areas.js'
@@ -498,3 +498,4 @@ const ENV = {
 }
 
 export default ENV
+

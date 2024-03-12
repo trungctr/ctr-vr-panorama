@@ -1,2 +1,3 @@
-# 3js-env
+# thre146-env
+
 ## threejs demo project

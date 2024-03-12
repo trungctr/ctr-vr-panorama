@@ -1,9 +1,9 @@
-﻿import * as THREE from '../3js/build/three.module.js'
-import { OrbitControls } from '../3js/examples/jsm/controls/OrbitControls.js'
-import { FirstPersonControls } from '../3js/examples/jsm/controls/FirstPersonControls.js'
-import { DragControls } from '../3js/examples/jsm/controls/DragControls.js'
-import { RGBELoader } from '../3js/examples/jsm/loaders/RGBELoader.js'
-import { XRControllerModelFactory } from '../3js/examples/jsm/webxr/XRControllerModelFactory.js'
+﻿import * as THREE from '../thre146/build/three.module.js'
+import { OrbitControls } from '../thre146/examples/jsm/controls/OrbitControls.js'
+import { FirstPersonControls } from '../thre146/examples/jsm/controls/FirstPersonControls.js'
+import { DragControls } from '../thre146/examples/jsm/controls/DragControls.js'
+import { RGBELoader } from '../thre146/examples/jsm/loaders/RGBELoader.js'
+import { XRControllerModelFactory } from '../thre146/examples/jsm/webxr/XRControllerModelFactory.js'
 import { CanvasUI } from '../canvas_gui/CanvasUI.js'
 import { EnvInit } from './webvr-compatibility.js'
 import { Areas, Devices } from './data.js'
@@ -133,15 +133,14 @@ class App {
 			map: '',
 			visible: false
 		})
-		if (GLOBAL_ENV.developing)
-		{
+		if (GLOBAL_ENV.developing) {
 			sphereMaterial.visible = true
 		}
-			App.refSphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
-			App.refSphere.position.set(0,0,0)
-			App.refSphere.name = 'snap'
-			App.refSphere.castShadow = false
-			App.trackGroup.add(App.refSphere)
+		App.refSphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
+		App.refSphere.position.set(0, 0, 0)
+		App.refSphere.name = 'snap'
+		App.refSphere.castShadow = false
+		App.trackGroup.add(App.refSphere)
 
 		// add sprite labels
 

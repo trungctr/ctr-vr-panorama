@@ -1,5 +1,5 @@
 ﻿//cần sửa lại đường dẫn mặc định của module three trong các file examples từ from 'three' thành  from '../../../build/three.module.js'
-import { OrbitControls } from '/3js/examples/jsm/controls/OrbitControls.js'
+import { OrbitControls } from '/thre146/examples/jsm/controls/OrbitControls.js'
 
 /** ambient light effect setting */
 const ambientLight = new THREE.AmbientLight(0x333333)

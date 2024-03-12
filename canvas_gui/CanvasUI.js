@@ -12,7 +12,7 @@ import {
 	Vector3,
 	IcosahedronBufferGeometry,
 	Color
-} from '../3js/build/three.module.js'
+} from '../thre146/build/three.module.js'
 
 import { CanvasKeyboard } from './CanvasKeyboard.js'
 import { CanvasColorPicker } from './CanvasColorPicker.js'
@@ -113,7 +113,7 @@ class CanvasUI {
 		//ctr: add user data
 		this.mesh.userData.type = this.config.watcher.split('')[0]
 		this.mesh.userData.name = this.config.watcher
-		
+
 		// spriteTL.center.set(0.0, 0.0)
 		spriteTL.scale.set(width, height, 1)
 		this.texture = new CanvasTexture(canvas)
@@ -502,10 +502,9 @@ class CanvasUI {
 	select(index = 0) {
 		if (this.selectedElements[index] !== undefined) {
 			const elm = this.selectedElements[index]
-			if (elm.onSelect)
-			{
+			if (elm.onSelect) {
 				elm.onSelect(this.config.watcher)
-				console.log('selected',elm,';;', this.config.watcher )
+				console.log('selected', elm, ';;', this.config.watcher)
 			}
 			if (elm.type === 'input-text') {
 				this.keyboard.mesh.visible = true
@@ -554,9 +553,8 @@ class CanvasUI {
 		const elm = this.selectedElements[index]
 
 		////////////////////////trungctr //////
-		
-		if (intersects.length > 0)
-		{
+
+		if (intersects.length > 0) {
 			// console.log('controller clicked')
 			if (elm && elm.type === 'slider') {
 				if (this.selectPressed[index]) {
@@ -941,10 +939,4 @@ class CanvasUI {
 }
 
 export { CanvasUI }
-
-
-
-
-
-
 
