@@ -246,6 +246,48 @@ class App {
 		//Theo dõi sự thay đổi kích thước cửa sổ và cập nhật kích thước vùng chứa
 		window.addEventListener('resize', this.resize.bind(App))
 
+		/**
+		 * setup VR/XR
+		 */
+		if (GLOBAL_ENV.device === 'Oculus' && GLOBAL_ENV.webGLcompatibility) {
+			App.renderer.xr.enabled = true
+			App.renderer.xr.setReferenceSpaceType('local')
+			const controllerModelFactory = new XRControllerModelFactory()
+
+			// controller
+			App.controller = App.renderer.xr.getController(0)
+			App.scene.add(App.controller)
+
+			const controllerGrip = App.renderer.xr.getControllerGrip(0)
+			controllerGrip.add(
+				controllerModelFactory.createControllerModel(controllerGrip)
+			)
+			App.scene.add(App.controllerGrip)
+
+			// controller
+			App.controller1 = App.renderer.xr.getController(1)
+			App.scene.add(App.controller1)
+
+			App.controllerGrip1 = App.renderer.xr.getControllerGrip(1)
+			controllerGrip1.add(
+				controllerModelFactory.createControllerModel(App.controllerGrip1)
+			)
+			App.scene.add(App.controllerGrip1)
+
+			//pointer linear
+			const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+				new THREE.Vector3(0, 0, 0),
+				new THREE.Vector3(0, 0, -1)
+			])
+
+			const line = new THREE.Line(lineGeometry)
+			line.name = 'selectorLine'
+			line.scale.z = 100
+
+			controller.add(line.clone())
+			controller1.add(line.clone())
+		}
+
 		//hàm điều khiển camera
 		App.controls = new OrbitControls(App.camera, App.renderer.domElement)
 		// App.clock = new THREE.Clock()
