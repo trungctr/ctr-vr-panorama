@@ -57,6 +57,7 @@ function devLog(message) {
 		})
 	}
 	GLOBAL_ENV.device = detectMob()
+	devLog('0.detected' + GLOBAL_ENV.device)
 })()
 
 class App {
