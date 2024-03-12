@@ -43,6 +43,25 @@ const GLOBAL_ENV = {
 	if (isWebGLAvailable() || isWebGL2Available()) {
 		GLOBAL_ENV.webGLcompatibility = true
 	}
+
+	function detectMob() {
+		const toMatch = [
+			/Android/i,
+			/webOS/i,
+			/iPhone/i,
+			/iPad/i,
+			/iPod/i,
+			/BlackBerry/i,
+			/Windows Phone/i,
+			/oculus/i,
+			/meta/i
+		]
+		return toMatch.some((toMatchItem) => {
+			return navigator.userAgent.match(toMatchItem)
+		})
+	}
+	GLOBAL_ENV.device = detectMob()
+	console.log(GLOBAL_ENV.device)
 })()
 
 class App {
