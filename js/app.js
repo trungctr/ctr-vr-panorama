@@ -50,14 +50,14 @@ function devLog(message) {
 		GLOBAL_ENV.webGLcompatibility = true
 	}
 
-	function detectMob() {
+	function isOculus() {
 		const toMatch = [/oculus/i, /meta/i]
 		return toMatch.some((toMatchItem) => {
 			return navigator.userAgent.match(toMatchItem)
 		})
 	}
-	GLOBAL_ENV.device = detectMob()
-	devLog('0.detected' + GLOBAL_ENV.device)
+	GLOBAL_ENV.device = isOculus()
+	devLog('0.isOculus = ' + GLOBAL_ENV.device)
 })()
 
 class App {
@@ -259,11 +259,8 @@ class App {
 		/**
 		 * setup VR/XR
 		 */
-		devLog(GLOBAL_ENV.device)
-		if (
-			(GLOBAL_ENV.device === 'Oculus' || GLOBAL_ENV.device === 'oculus') &&
-			GLOBAL_ENV.webGLcompatibility
-		) {
+
+		if (GLOBAL_ENV.device && GLOBAL_ENV.webGLcompatibility) {
 			let currentSession = null
 			devLog(GLOBAL_ENV.device)
 			async function onSessionStarted(session) {
