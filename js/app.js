@@ -187,6 +187,12 @@ class App {
 		this.renderer.setSize(window.innerWidth, window.innerHeight)
 		// thêm của sổ ứng dụng vào vùng chứa được tạo trước đó
 		container.appendChild(this.renderer.domElement)
+		/*
+		 * Quá trình kết xuất cần hiển thị cảnh nhiều lần
+		 * để những thay đổi về vị trí camera và đối tượng trong cảnh được cập nhật liên tục
+		 * chúng ta có thể thiết lập vòng lặp hoạt ảnh để thực hiện việc đó.
+		 */
+		this.renderer.setAnimationLoop(this.render.bind(_THIS))
 	}
 
 	resize() {
@@ -250,15 +256,8 @@ class App {
 
 	WebGLrender() {
 		const _THIS = this
-		/*
-		 * Quá trình kết xuất cần hiển thị cảnh nhiều lần
-		 * để những thay đổi về vị trí camera và đối tượng trong cảnh được cập nhật liên tục
-		 * chúng ta có thể thiết lập vòng lặp hoạt ảnh để thực hiện việc đó.
-		 */
-		this.renderer.setAnimationLoop(this.render.bind(_THIS))
 		//Theo dõi sự thay đổi kích thước cửa sổ và cập nhật kích thước vùng chứa
 		window.addEventListener('resize', this.resize.bind(_THIS))
-
 		//hàm điều khiển camera
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement)
 		// this.clock = new THREE.Clock()
