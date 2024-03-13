@@ -3,27 +3,27 @@ import { OrbitControls } from '../three146/examples/jsm/controls/OrbitControls.j
 import { RGBELoader } from '../three146/examples/jsm/loaders/RGBELoader.js'
 import { XRControllerModelFactory } from '../three146/examples/jsm/webxr/XRControllerModelFactory.js'
 import { CanvasUI } from '../canvas_gui/CanvasUI.js'
-import { EnvInit } from './webvr-compatibility.js'
-import Areas from './areas.js'
-import Devices from './devices.js'
+import { ENV_driven } from './environmentDriven.js'
+import { Areas, Devices } from './data.js'
 
-const currentScene = {
+const Scene = {
 	ID: 'A_1',
 	devices: {},
 	img: '',
 	mark: () => {},
 	renderer: new THREE.WebGLRenderer({ antialias: true }),
 	scene: new THREE.Scene(),
-	// currentScene.camera parameters: field od view, with/height, near(distance form currentScene.camera to near plan) and far (distance form currentScene.camera to far plan)
+	// Scene.camera parameters: field od view, with/height, near(distance form Scene.camera to near plan) and far (distance form Scene.camera to far plan)
 	camera: new THREE.PerspectiveCamera(
 		75,
 		window.innerWidth / window.innerHeight,
 		0.1,
-		1000000
+		1000
 	),
 	textureLoader: new THREE.TextureLoader(),
 	startButton: document.getElementById('start-button'),
 	mouse: new THREE.Vector2(),
+	trackGroup: new THREE.Group(),
 	raycaster: new THREE.Raycaster(),
 	uiVisibility: false,
 	gridsHelper: false,
@@ -43,21 +43,21 @@ function clearBody() {
 function configScene(w) {
 	const area = Areas[w]
 	// console.log(area)
-	const oldDvs = Object.keys(currentScene.devices)
-	currentScene.textureLoader.load(area.img, (tr) => {
+	const oldDvs = Object.keys(Scene.devices)
+	Scene.textureLoader.load(area.img, (tr) => {
 		tr.mapping = THREE.EquirectangularReflectionMapping
-		currentScene.scene.background = tr
+		Scene.scene.background = tr
 	})
-	// currentScene.img.material.map = currentScene.textureLoader.load(area.img)
+	// Scene.img.material.map = Scene.textureLoader.load(area.img)
 	if (oldDvs.length > 0) {
 		for (let i = 0; i < oldDvs.length; i++) {
-			currentScene.scene.getObjectByName(oldDvs[i]).removeFromParent()
-			console.log('for', oldDvs[i], currentScene.devices[oldDvs[i]])
+			Scene.scene.getObjectByName(oldDvs[i]).removeFromParent()
+			console.log('for', oldDvs[i], Scene.devices[oldDvs[i]])
 		}
-		currentScene.devices = {}
+		Scene.devices = {}
 	}
-	currentScene.ID = w
-	if (currentScene.vrMenu) currentScene.vrMenu.updateElement('info', area.name)
+	Scene.ID = w
+	if (Scene.vrMenu) Scene.vrMenu.updateElement('info', area.name)
 	if (area.voice != '') {
 		document.getElementById('SFX-speaker').src = area.voice
 		document.getElementById('SFX-speaker').play()
@@ -88,41 +88,36 @@ function handleDevices(m) {
 				hover: '#bb0'
 				// onSelect: execute
 			},
-			renderer: currentScene.renderer,
-			watcher: m
+			renderer: Scene.renderer,
+			watcher: m,
+			type: 'sprite' // or static
 		}
 
 		const content = {
 			name: dvc
 		}
 
-		currentScene.devices[m] = new CanvasUI(content, config)
-		currentScene.devices[m].mesh.position.set(
+		Scene.devices[m] = new CanvasUI(content, config)
+		Scene.devices[m].mesh.position.set(
 			Devices[m].pos.x,
 			Devices[m].pos.y,
 			Devices[m].pos.z
 		)
-		currentScene.devices[m].mesh.rotation.y =
-			(Devices[m].pos.r / 180) * Math.PI
-		currentScene.devices[m].mesh.name = m
-		currentScene.devices[m].mesh.scale.set(300, 300, 300)
-		currentScene.scene.add(currentScene.devices[m].mesh)
+		Scene.devices[m].mesh.rotation.y = (Devices[m].pos.r / 180) * Math.PI
+		Scene.devices[m].mesh.name = m
+		Scene.devices[m].mesh.scale.set(300, 300, 300)
+		Scene.scene.add(Scene.devices[m].mesh)
 	}
 }
 
 function mouseSelector() {
 	//selector
 	// make sure listeners listen from renderer domElement, if not will have many error
-	currentScene.renderer.domElement.addEventListener('click', function (e) {
-		currentScene.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
-		currentScene.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1
-		currentScene.raycaster.setFromCamera(
-			currentScene.mouse,
-			currentScene.camera
-		)
-		const oList = currentScene.raycaster.intersectObjects(
-			currentScene.scene.children
-		)
+	Scene.renderer.domElement.addEventListener('click', function (e) {
+		Scene.mouse.x = (e.clientX / window.innerWidth) * 2 - 1
+		Scene.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1
+		Scene.raycaster.setFromCamera(Scene.mouse, Scene.camera)
+		const oList = Scene.raycaster.intersectObjects(Scene.scene.children)
 		for (let i = 0; i < oList.length; i++) {
 			if (oList[i].object.material.visible === false) {
 				continue
@@ -163,7 +158,7 @@ function mouseSelector() {
 						oList[i].point.y,
 						oList[i].point.z
 					)
-					currentScene.scene.add(sphere)
+					Scene.scene.add(sphere)
 				}
 			}
 		}
@@ -181,7 +176,7 @@ function execute(w) {
 }
 
 function onPrev() {
-	const ext = currentScene.ID.split('_')
+	const ext = Scene.ID.split('_')
 	const order = Number(ext[1]) - 1
 	if (Number(ext[1]) == 18) order = 18
 	console.log(order)
@@ -190,7 +185,7 @@ function onPrev() {
 }
 
 function onNext() {
-	const ext = currentScene.ID.split('_')
+	const ext = Scene.ID.split('_')
 	let order = Number(ext[1]) + 1
 	if (Number(ext[1]) == 18) order = 1
 	const nextName = 'A_' + order
@@ -257,7 +252,7 @@ function addVrMenu() {
 			hover: '#2659a4',
 			onSelect: onNext
 		},
-		renderer: currentScene.renderer,
+		renderer: Scene.renderer,
 		watcher: 'W'
 	}
 
@@ -270,10 +265,10 @@ function addVrMenu() {
 		next: '<path>M 54 32 L 10 10 L 10 54 Z</path>'
 	}
 
-	currentScene.vrMenu = new CanvasUI(content, config)
+	Scene.vrMenu = new CanvasUI(content, config)
 
-	currentScene.vrMenu.mesh.position.set(0, 0, -2)
-	currentScene.scene.add(currentScene.vrMenu.mesh)
+	Scene.vrMenu.mesh.position.set(0, 0, -2)
+	Scene.scene.add(Scene.vrMenu.mesh)
 }
 
 function keyboardControl() {
@@ -281,12 +276,12 @@ function keyboardControl() {
 	document.addEventListener('keydown', (e) => {
 		console.log(e.key)
 		if (e.key === 'h' || e.key === 'Escape') {
-			if (currentScene.uiVisibility == false) {
+			if (Scene.uiVisibility == false) {
 				mainMenu.classList.remove('hide')
-				currentScene.uiVisibility = true
+				Scene.uiVisibility = true
 			} else {
 				mainMenu.classList.add('hide')
-				currentScene.uiVisibility = false
+				Scene.uiVisibility = false
 			}
 		}
 		if (e.key === 'ArrowRight' || e.key === 'd') {
@@ -314,41 +309,41 @@ function keyboardControl() {
 function init() {
 	clearBody()
 	//setup renderer
-	currentScene.renderer.setClearColor(0x000)
-	currentScene.renderer.setPixelRatio(window.devicePixelRatio)
-	currentScene.renderer.setSize(window.innerWidth, window.innerHeight)
-	currentScene.renderer.shadowMap.enabled = true
-	document.body.appendChild(currentScene.renderer.domElement)
+	Scene.renderer.setClearColor(0x000)
+	Scene.renderer.setPixelRatio(window.devicePixelRatio)
+	Scene.renderer.setSize(window.innerWidth, window.innerHeight)
+	Scene.renderer.shadowMap.enabled = true
+	document.body.appendChild(Scene.renderer.domElement)
 
 	//setup camera
-	currentScene.camera.position.set(0, 0, 1)
-	currentScene.camera.name = 'Camera'
-	currentScene.camera.lookAt(0, 0, 0)
-	currentScene.camera.updateMatrixWorld()
-	currentScene.camera.updateProjectionMatrix()
+	Scene.camera.position.set(0, 0, 1)
+	Scene.camera.name = 'Camera'
+	Scene.camera.lookAt(0, 0, 0)
+	Scene.camera.updateMatrixWorld()
+	Scene.camera.updateProjectionMatrix()
 
 	/**
 	 *  light effect setup
 	 */
-	currentScene.ambientLight = new THREE.AmbientLight(0xffffff)
-	currentScene.scene.add(currentScene.ambientLight)
+	Scene.ambientLight = new THREE.AmbientLight(0xffffff)
+	Scene.scene.add(Scene.ambientLight)
 
 	/**
 	 * add develope helper (for developer)
 	 */
 	// axis helper
-	if (currentScene.axiesHelper) {
+	if (Scene.axiesHelper) {
 		const axesHelper = new THREE.AxesHelper(100)
 		axesHelper.setColors(0xff0000, 0x00ff00, 0x0000ff)
 		axesHelper.updateMatrixWorld()
-		currentScene.scene.add(axesHelper)
+		Scene.scene.add(axesHelper)
 	}
 
 	//grid helper
-	if (currentScene.gridsHelper) {
+	if (Scene.gridsHelper) {
 		const gridsHelper = new THREE.GridHelper(30, 30)
 		gridsHelper.updateMatrixWorld()
-		currentScene.scene.add(gridsHelper)
+		Scene.scene.add(gridsHelper)
 	}
 
 	/**
@@ -363,17 +358,17 @@ function init() {
 		map: '',
 		visible: true
 	})
-	currentScene.img = new THREE.Mesh(sphereGeometry, sphereMaterial)
-	currentScene.img.name = 'camera locker'
-	currentScene.img.position.set(0, 0, 0)
-	currentScene.img.castShadow = false
-	currentScene.scene.add(currentScene.img)
-	// currentScene.img.add(currentScene.camera)
+	Scene.img = new THREE.Mesh(sphereGeometry, sphereMaterial)
+	Scene.img.name = 'camera locker'
+	Scene.img.position.set(0, 0, 0)
+	Scene.img.castShadow = false
+	Scene.scene.add(Scene.img)
+	// Scene.img.add(Scene.camera)
 
 	window.addEventListener('resize', () => {
-		currentScene.camera.aspect = window.innerWidth / window.innerHeight
-		currentScene.renderer.setSize(window.innerWidth, window.innerHeight)
-		currentScene.camera.updateProjectionMatrix()
+		Scene.camera.aspect = window.innerWidth / window.innerHeight
+		Scene.renderer.setSize(window.innerWidth, window.innerHeight)
+		Scene.camera.updateProjectionMatrix()
 	})
 
 	/**
@@ -384,12 +379,9 @@ function init() {
 const ENV = {
 	webGL: () => {
 		init()
-		//setup currentScene.camera control
-		const orbit = new OrbitControls(
-			currentScene.camera,
-			currentScene.renderer.domElement
-		)
-		orbit.target = currentScene.scene.position
+		//setup Scene.camera control
+		const orbit = new OrbitControls(Scene.camera, Scene.renderer.domElement)
+		orbit.target = Scene.scene.position
 		orbit.touches = {
 			ONE: THREE.TOUCH.ROTATE,
 			TWO: ''
@@ -418,9 +410,9 @@ const ENV = {
 		 */
 		function mainLoop() {
 			maintainMethods()
-			currentScene.renderer.render(currentScene.scene, currentScene.camera)
+			Scene.renderer.render(Scene.scene, Scene.camera)
 		}
-		currentScene.renderer.setAnimationLoop(mainLoop)
+		Scene.renderer.setAnimationLoop(mainLoop)
 	},
 	VR: () => {
 		init()
@@ -428,29 +420,29 @@ const ENV = {
 		 * setup VR/XR
 		 */
 
-		currentScene.renderer.xr.enabled = true
-		currentScene.renderer.xr.setReferenceSpaceType('local')
+		Scene.renderer.xr.enabled = true
+		Scene.renderer.xr.setReferenceSpaceType('local')
 		const controllerModelFactory = new XRControllerModelFactory()
 
 		// controller
-		const controller = currentScene.renderer.xr.getController(0)
-		currentScene.scene.add(controller)
+		const controller = Scene.renderer.xr.getController(0)
+		Scene.scene.add(controller)
 
-		const controllerGrip = currentScene.renderer.xr.getControllerGrip(0)
+		const controllerGrip = Scene.renderer.xr.getControllerGrip(0)
 		controllerGrip.add(
 			controllerModelFactory.createControllerModel(controllerGrip)
 		)
-		currentScene.scene.add(controllerGrip)
+		Scene.scene.add(controllerGrip)
 
 		// controller
-		const controller1 = currentScene.renderer.xr.getController(1)
-		currentScene.scene.add(controller1)
+		const controller1 = Scene.renderer.xr.getController(1)
+		Scene.scene.add(controller1)
 
-		const controllerGrip1 = currentScene.renderer.xr.getControllerGrip(1)
+		const controllerGrip1 = Scene.renderer.xr.getControllerGrip(1)
 		controllerGrip1.add(
 			controllerModelFactory.createControllerModel(controllerGrip1)
 		)
-		currentScene.scene.add(controllerGrip1)
+		Scene.scene.add(controllerGrip1)
 
 		//
 		const geometry = new THREE.BufferGeometry().setFromPoints([
@@ -469,14 +461,14 @@ const ENV = {
 		 * add GUI
 		 */
 		addVrMenu()
-		controller1.attach(currentScene.vrMenu.mesh)
+		controller1.attach(Scene.vrMenu.mesh)
 
 		/**
 		 * Optimized function here
 		 */
 
 		function maintainMethods() {
-			currentScene.vrMenu.update()
+			Scene.vrMenu.update()
 		}
 
 		/**
@@ -488,12 +480,12 @@ const ENV = {
 		 */
 		function mainLoop() {
 			maintainMethods()
-			currentScene.renderer.render(currentScene.scene, currentScene.camera)
+			Scene.renderer.render(Scene.scene, Scene.camera)
 		}
-		currentScene.renderer.setAnimationLoop(mainLoop)
+		Scene.renderer.setAnimationLoop(mainLoop)
 	},
 	START: () => {
-		EnvInit.formatButton(currentScene.renderer, currentScene.startButton)
+		ENV_driven.drive(Scene)
 	}
 }
 

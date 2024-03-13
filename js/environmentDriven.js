@@ -1,6 +1,9 @@
-import App from './app.js'
-class EnvInit {
-	static formatButton(renderer, button) {
+/**
+ * @method drive environment depend on compatibility} 
+ * @param main type=object - the main thread to run
+ */
+class ENV_driven {
+	static drive(main) {
 		function isOculus() {
 			const toMatch = [/oculus/i, /meta/i]
 			return toMatch.some((toMatchItem) => {
@@ -13,7 +16,7 @@ class EnvInit {
 			async function onSessionStarted(session) {
 				session.addEventListener('end', onSessionEnded)
 
-				await renderer.xr.setSession(session)
+				await main.renderer.xr.setSession(session)
 				console.log('VR session started !!')
 				currentSession = session
 			}
@@ -24,9 +27,9 @@ class EnvInit {
 				currentSession = null
 			}
 
-			button.style.backgroundColor = 'rgba(0,200,0,0.8)'
-			button.textContent = 'BẮT ĐẦU THAM QUAN'
-			button.onclick = function () {
+			main.GLOBAL_ENV.startButton.style.backgroundColor = 'rgba(0,200,0,0.8)'
+			main.GLOBAL_ENV.startButton.textContent = 'BẮT ĐẦU THAM QUAN'
+			main.GLOBAL_ENV.startButton.onclick = function () {
 				if (currentSession === null) {
 					// WebXR's requestReferenceSpace only works if the corresponding feature
 					// was requested at session creation time. For simplicity, just ask for
@@ -34,7 +37,7 @@ class EnvInit {
 					// requestReferenceSpace call will fail if it turns out to be unavailable.
 					// ('local' is always available for immersive sessions and doesn't need to
 					// be requested separately.)
-					Env.VR()
+					main.render()
 					const sessionInit = {
 						optionalFeatures: [
 							'local-floor',
@@ -53,10 +56,10 @@ class EnvInit {
 		}
 
 		function turnToWebGL() {
-			button.style.background = 'rgba(0,0,255,0.8)'
-			button.textContent = 'BẮT ĐẦU THAM QUAN'
-			button.onclick = () => {
-				App.webGL()
+			main.GLOBAL_ENV.startButton.style.background = 'rgba(0,0,255,0.8)'
+			main.GLOBAL_ENV.startButton.textContent = 'BẮT ĐẦU THAM QUAN'
+			main.GLOBAL_ENV.startButton.onclick = () => {
+				main.render()
 			}
 			console.log('Using WebGL')
 		}
@@ -83,13 +86,13 @@ class EnvInit {
 
 					condition ? showEnterVR() : showWebXRNotFound()
 
-					if (condition && EnvInit.xrSessionIsGranted) {
-						button.click()
+					if (condition && ENV_driven.xrSessionIsGranted) {
+						main.GLOBAL_ENV.startButton.click()
 					}
 				})
 				.catch((e) => showVRNotAllowed())
 
-			return button
+			return main.GLOBAL_ENV.startButton
 		} else {
 			if (window.isSecureContext === false) {
 				var result = confirm(
@@ -106,7 +109,7 @@ class EnvInit {
 				message.href = 'https://immersiveweb.dev/'
 				message.innerHTML = 'WEBXR NOT AVAILABLE'
 			}
-			turnToWebGL(button)
+			turnToWebGL(main.GLOBAL_ENV.startButton)
 
 			return message
 		}
@@ -121,13 +124,17 @@ class EnvInit {
 			if (/WebXRViewer\//i.test(navigator.userAgent)) return
 
 			navigator.xr.addEventListener('sessiongranted', () => {
-				EnvInit.xrSessionIsGranted = true
+				ENV_driven.xrSessionIsGranted = true
 			})
 		}
 	}
 }
 
-EnvInit.registerSessionGrantedListener()
+ENV_driven.registerSessionGrantedListener()
 
-export { EnvInit }
+export default ENV_driven 
+
+
+
+
 
