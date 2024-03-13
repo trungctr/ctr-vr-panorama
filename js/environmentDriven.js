@@ -1,15 +1,9 @@
 /**
- * @method drive environment depend on compatibility} 
+ * @method drive environment depend on compatibility}
  * @param main type=object - the main thread to run
  */
 class ENV_driven {
 	static drive(main) {
-		function isOculus() {
-			const toMatch = [/oculus/i, /meta/i]
-			return toMatch.some((toMatchItem) => {
-				return navigator.userAgent.match(toMatchItem)
-			})
-		}
 		function showEnterVR(/*device*/) {
 			let currentSession = null
 
@@ -37,13 +31,13 @@ class ENV_driven {
 					// requestReferenceSpace call will fail if it turns out to be unavailable.
 					// ('local' is always available for immersive sessions and doesn't need to
 					// be requested separately.)
-					main.render()
+					main.VRrender()
 					const sessionInit = {
 						optionalFeatures: [
-							'local-floor',
-							'bounded-floor',
-							'hand-tracking',
-							'layers'
+							'local-floor'
+							// 'bounded-floor',
+							// 'hand-tracking',
+							// 'layers'
 						]
 					}
 					navigator.xr
@@ -59,7 +53,7 @@ class ENV_driven {
 			main.GLOBAL_ENV.startButton.style.background = 'rgba(0,0,255,0.8)'
 			main.GLOBAL_ENV.startButton.textContent = 'BẮT ĐẦU THAM QUAN'
 			main.GLOBAL_ENV.startButton.onclick = () => {
-				main.render()
+				main.WebGLrender()
 			}
 			console.log('Using WebGL')
 		}
@@ -76,13 +70,16 @@ class ENV_driven {
 			)
 		}
 
-		if ('xr' in navigator) {
-			turnToWebGL()
+		if (
+			main.GLOBAL_ENV.isOculus
+			// 'xr' in navigator
+		) {
+			// turnToWebGL()
 
 			navigator.xr
 				.isSessionSupported('immersive-vr')
 				.then(function (supported) {
-					const condition = supported && isOculus()
+					const condition = supported
 
 					condition ? showEnterVR() : showWebXRNotFound()
 
@@ -106,12 +103,11 @@ class ENV_driven {
 					turnToWebGL()
 				}
 			} else {
-				message.href = 'https://immersiveweb.dev/'
-				message.innerHTML = 'WEBXR NOT AVAILABLE'
+				main.GLOBAL_ENV.devLog.error('WEBXR NOT AVAILABLE: <a href="https://immersiveweb.dev/">https://immersiveweb.dev/</a>')
 			}
 			turnToWebGL(main.GLOBAL_ENV.startButton)
 
-			return message
+			return 0
 		}
 	}
 
@@ -132,9 +128,5 @@ class ENV_driven {
 
 ENV_driven.registerSessionGrantedListener()
 
-export default ENV_driven 
-
-
-
-
+export default ENV_driven
 

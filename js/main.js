@@ -18,24 +18,28 @@ function showIntro() {
 }
 soundButton.onclick = () => {
 	showIntro()
-	sfx.play()
-	bgm.play()
-	bgm.volume = 0.4
+	GLOBAL_ENV.sfx.play()
+	GLOBAL_ENV.bgm.play()
+	GLOBAL_ENV.bgm.volume = 0.4
 }
 soundButton2.onclick = () => {
 	showIntro()
-	sfx.pause()
-	bgm.pause()
-	sfx.volume = 0
-	bgm.volume = 0
+	GLOBAL_ENV.sfx.pause()
+	GLOBAL_ENV.bgm.pause()
+	GLOBAL_ENV.sfx.volume = 0
+	GLOBAL_ENV.bgm.volume = 0
 }
+
+GLOBAL_ENV.startButton.addEventListener('click', () => { 
+	document.getElementById('introContainer').classList.add('hide')
+})
 
 
 
 if (GLOBAL_ENV.webGLcompatibility)
 {
 	const app = new App
-	window.app = app
+	// window.app = app
 	ENV_driven.drive(app)
 } else {
 	const warning = WebGLcheck.getWebGLErrorMessage()

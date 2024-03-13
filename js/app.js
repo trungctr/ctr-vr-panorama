@@ -2,7 +2,7 @@
 import { OrbitControls } from '../three146/examples/jsm/controls/OrbitControls.js'
 import { XRControllerModelFactory } from '../three146/examples/jsm/webxr/XRControllerModelFactory.js'
 import { CanvasUI } from '../canvas_gui/CanvasUI.js'
-import  ENV_driven  from './environmentDriven.js'
+import ENV_driven from './environmentDriven.js'
 import { Areas, Devices } from './data.js'
 import GLOBAL_ENV from './global.js'
 
@@ -81,7 +81,7 @@ class App {
 		// track group
 		this.trackGroup = new THREE.Group()
 
-		// reference sphere
+		//#ref  reference sphere
 		const sphereGeometry = new THREE.SphereGeometry(100, 100, 10)
 		const sphereMaterial = new THREE.MeshStandardMaterial({
 			color: 0x000000,
@@ -187,7 +187,69 @@ class App {
 		this.renderer.setSize(window.innerWidth, window.innerHeight)
 		// thêm của sổ ứng dụng vào vùng chứa được tạo trước đó
 		container.appendChild(this.renderer.domElement)
+	}
 
+	resize() {
+		this.camera.aspect = window.innerWidth / window.innerHeight
+		this.camera.updateProjectionMatrix()
+		this.renderer.setSize(window.innerWidth, window.innerHeight)
+	}
+
+	action() {}
+	render() {
+		this.renderer.render(this.scene, this.camera)
+	}
+
+	VRrender() {
+		/**
+		 * setup VR/XR
+		 */
+		this.renderer.xr.enabled = true
+		this.renderer.xr.setReferenceSpaceType('local')
+		const controllerModelFactory = new XRControllerModelFactory()
+
+		// controller
+		this.controller = this.renderer.xr.getController(0)
+		this.scene.add(this.controller)
+
+		this.controllerGrip = this.renderer.xr.getControllerGrip(0)
+		this.controllerGrip.add(
+			controllerModelFactory.createControllerModel(this.controllerGrip)
+		)
+		this.scene.add(this.controllerGrip)
+
+		// controller
+		this.controller1 = this.renderer.xr.getController(1)
+		this.scene.add(this.controller1)
+
+		this.controllerGrip1 = this.renderer.xr.getControllerGrip(1)
+		this.controllerGrip1.add(
+			controllerModelFactory.createControllerModel(this.controllerGrip1)
+		)
+		this.scene.add(this.controllerGrip1)
+
+		//pointer linear
+		const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+			new THREE.Vector3(0, 0, 0),
+			new THREE.Vector3(0, 0, -1)
+		])
+
+		const line = new THREE.Line(lineGeometry)
+		line.name = 'selectorLine'
+		line.scale.z = 100
+
+		this.controller.add(line.clone())
+		this.controller1.add(line.clone())
+
+		this.trackGroup.position.copy(this.camera.position)
+		//-------------------------------------------------------
+		this.action()
+		//-------------------------------------------------------
+		this.render()
+	}
+
+	WebGLrender() {
+		const _THIS = this
 		/*
 		 * Quá trình kết xuất cần hiển thị cảnh nhiều lần
 		 * để những thay đổi về vị trí camera và đối tượng trong cảnh được cập nhật liên tục
@@ -196,50 +258,6 @@ class App {
 		this.renderer.setAnimationLoop(this.render.bind(_THIS))
 		//Theo dõi sự thay đổi kích thước cửa sổ và cập nhật kích thước vùng chứa
 		window.addEventListener('resize', this.resize.bind(_THIS))
-
-		/**
-		 * setup VR/XR
-		 */
-
-		if (this.GLOBAL_ENV.device && this.GLOBAL_ENV.webGLcompatibility) {
-			this.renderer.xr.enabled = true
-			this.renderer.xr.setReferenceSpaceType('local')
-			const controllerModelFactory = new XRControllerModelFactory()
-
-			// controller
-			this.controller = this.renderer.xr.getController(0)
-			this.scene.add(this.controller)
-
-			this.controllerGrip = this.renderer.xr.getControllerGrip(0)
-			this.controllerGrip.add(
-				controllerModelFactory.createControllerModel(controllerGrip)
-			)
-			this.scene.add(this.controllerGrip)
-
-			// controller
-			this.controller1 = this.renderer.xr.getController(1)
-			this.scene.add(this.controller1)
-
-			this.controllerGrip1 = this.renderer.xr.getControllerGrip(1)
-			this.controllerGrip1.add(
-				controllerModelFactory.createControllerModel(this.controllerGrip1)
-			)
-			this.scene.add(this.controllerGrip1)
-
-			//pointer linear
-			const lineGeometry = new THREE.BufferGeometry().setFromPoints([
-				new THREE.Vector3(0, 0, 0),
-				new THREE.Vector3(0, 0, -1)
-			])
-
-			const line = new THREE.Line(lineGeometry)
-			line.name = 'selectorLine'
-			line.scale.z = 100
-
-			this.controller.add(line.clone())
-			this.controller1.add(line.clone())
-			currentSession.removeEventListener('end', onSessionEnded)
-		}
 
 		//hàm điều khiển camera
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement)
@@ -250,42 +268,11 @@ class App {
 		// 	this.refSphere.position.z
 		// )
 		// this.controls.update()
-	}
 
-	resize() {
-		console.log(this.state)
-		this.camera.aspect = window.innerWidth / window.innerHeight
-		this.camera.updateProjectionMatrix()
-		this.renderer.setSize(window.innerWidth, window.innerHeight)
-	}
-
-	render() {
-		document.onkeydown = (e) => {
-			switch (e.code) {
-				case 'KeyW' || 'ArrowUp':
-					this.camera.translateZ(-GLOBAL_ENV.moveSpeed || 0.5)
-					break
-				case 'KeyS' || 'ArrowDown':
-					this.camera.translateZ(GLOBAL_ENV.moveSpeed|| 0.5)
-					break
-				case 'KeyD' || 'ArrowRight':
-					this.camera.translateX(GLOBAL_ENV.moveSpeed|| 0.5)
-					break
-				case 'KeyA' || 'ArrowLeft':
-					this.camera.translateX(-GLOBAL_ENV.moveSpeed|| 0.5)
-					break
-				case 'Space':
-					this.camera.translateY(GLOBAL_ENV.moveSpeed|| 0.5)
-					break
-				case 'ControlLeft' || 'ControlRight':
-					this.camera.translateY(-GLOBAL_ENV.moveSpeed|| 0.5)
-					break
-				default:
-					return 0
-			}
-		}
-		this.trackGroup.position.copy(this.camera.position)
-		this.renderer.render(this.scene, this.camera)
+		//-------------------------------------------------------
+		this.action()
+		//-------------------------------
+		this.render()
 	}
 }
 

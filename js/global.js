@@ -1,24 +1,36 @@
 ﻿const GLOBAL_ENV = {
-	version: '12.03.24.1927',
-	device: true,
+	version: '13.03.24.1256',
+	isOculus: 'unknown',
 	webGLcompatibility: false,
 	developing: true,
 	moveSpeed: 0.5,
 	startButton: document.getElementById('start-button'),
 	bgm: document.getElementById('BGM-speaker'),
 	sfx: document.getElementById('SFX-speaker'),
-	speak: document.getElementById('speak-speaker')
-}
-
-function devLog(message) {
-	if (GLOBAL_ENV.developing) {
-		document.getElementById('console').innerHTML += String(message) + '<br>'
+	speak: document.getElementById('speak-speaker'),
+	devLog: {
+		error: (message) => {
+			if (GLOBAL_ENV.developing) {
+				document.getElementById('console').innerHTML +=
+					'[ERROR] ' + String(message) + '<br>'
+			}
+		},
+		info: (message) => {
+			if (GLOBAL_ENV.developing) {
+				document.getElementById('console').innerHTML +=
+					'[INFO] '+String(message) + '<br>'
+			}
+		}
 	}
 }
+
 /**
  * Hàm này để kiểm tra tương thích webGL và thiết bị
  */
 ;(() => {
+	if (GLOBAL_ENV.developing) {
+		document.getElementById('console').classList.remove('hide')
+	}
 	function isWebGLAvailable() {
 		try {
 			const canvas = document.createElement('canvas')
@@ -50,9 +62,9 @@ function devLog(message) {
 			return navigator.userAgent.match(toMatchItem)
 		})
 	}
-	GLOBAL_ENV.device = isOculus()
-	devLog('0.isOculus = ' + GLOBAL_ENV.device)
-	devLog('1.Version = ' + GLOBAL_ENV.version)
+	GLOBAL_ENV.isOculus = isOculus()
+	GLOBAL_ENV.devLog.info('0.isOculus = ' + GLOBAL_ENV.isOculus)
+	GLOBAL_ENV.devLog.info('1.Version = ' + GLOBAL_ENV.version)
 })()
 
 export default GLOBAL_ENV
