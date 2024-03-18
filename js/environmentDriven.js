@@ -108,7 +108,7 @@ class ENV_driver {
 						_THIS.startButton.click()
 					}
 				})
-				.catch((e) => _THIS.VRNotAllowed())
+				.catch((e) => _THIS.VRNotAllowed(e))
 
 			return _THIS.startButton
 		} else {

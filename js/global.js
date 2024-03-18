@@ -1,6 +1,6 @@
 ﻿const GLOBAL_ENV = {
 	version: '0.1.0',
-	build: '18.03.24.2206',
+	build: '18.03.24.2238',
 	isOculus: false,
 	webGLcompatibility: false,
 	developing: true,
