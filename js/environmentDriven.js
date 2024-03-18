@@ -72,7 +72,7 @@ class ENV_driver {
 		const _THIS = this
 		_THIS.turnToWebGL()
 		_THIS.log.error(
-			'Exception when trying to call xr.isSessionSupported, turn to WebGL',
+			'Exception when trying to call xr.isSessionSupported, turn to WebGL \n'+
 			exception
 		)
 	}
