@@ -1,6 +1,7 @@
 ﻿const GLOBAL_ENV = {
-	version: '13.03.24.1304',
-	isOculus: 'unknown',
+	version: '0.1.0',
+	build: '18.03.24.2206',
+	isOculus: false,
 	webGLcompatibility: false,
 	developing: true,
 	moveSpeed: 0.5,
@@ -11,14 +12,18 @@
 	devLog: {
 		error: (message) => {
 			if (GLOBAL_ENV.developing) {
-				document.getElementById('console').innerHTML +=
-					'[ERROR] ' + String(message) + '<br>'
+				let content = `<p style="background: rgba(255,0,0,0.8)">[ERROR] ${String(
+					message
+				)}</p>`
+				document.getElementById('console-body').innerHTML += content
+				console.log(message)
 			}
 		},
 		info: (message) => {
 			if (GLOBAL_ENV.developing) {
-				document.getElementById('console').innerHTML +=
-					'[INFO] '+String(message) + '<br>'
+				let content = `<p>[INFO] ${String(message)}</p>`
+				document.getElementById('console-body').innerHTML += content
+				console.log(message)
 			}
 		}
 	}

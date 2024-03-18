@@ -6,144 +6,162 @@ export const Areas = {
 		name: 'Khu nhận mẫu ban đầu',
 		voice: `${root}/asset/voices/F2.m4a`,
 		img: `${root}/asset/img/webp/scene_1.webp`,
-		devices: {}
+		labels: []
 	},
 	A_2: {
 		stt: '3_1',
 		name: 'Khu vực hệ thống tự động hoàn toàn Roche (1/3)',
 		voice: `${root}/asset/voices/F3.m4a`,
 		img: `${root}/asset/img/webp/scene_3.webp`,
-		devices: {
-			m1: {
-				id: 'M1',
-				pos: { x: 1, y: 1, z: 1 }
-			}
-		}
+		labels: [{ id: 'M1', pos: { x: 30, y: 1, z: 30 } }]
 	},
 	A_3: {
 		stt: '3_2',
 		name: 'Khu vực hệ thống tự động hoàn toàn Roche (2/3)',
 		voice: ``,
 		img: `${root}/asset/img/webp/scene_4.webp`,
-		devices: {
-			M1: {
-				id: 'M1',
-				pos: { x: 30, y: -5, z: 30 }
-			},
-			M2: {
-				id: 'M2',
-				pos: { x: 30, y: -9, z: 30 }
-			},
-			M3: {
-				id: 'M3',
-				pos: { x: 30, y: 2, z: 30 }
-			}
-		}
+		labels: [
+			{ id: 'M1', pos: { x: 30, y: 9, z: 30 } },
+			{ id: 'M2', pos: { x: 30, y: 0, z: 30 } },
+			{ id: 'M3', pos: { x: 30, y: -9, z: 30 } }
+		]
 	},
 	A_4: {
 		stt: '3_3',
 		name: 'Khu vực hệ thống tự động hoàn toàn Roche (3/3)',
 		voice: ``,
 		img: `${root}/asset/img/webp/scene_5.webp`,
-		devices: ['M2', 'M3']
+		labels: [
+			{ id: 'M2', pos: { x: 30, y: 9, z: 30 } },
+			{ id: 'M3', pos: { x: 30, y: 0, z: 30 } }
+		]
 	},
 	A_5: {
 		stt: '4_1',
 		name: 'Khu vực hệ thống tự động toàn Abbott (1/2)',
 		voice: `${root}/asset/voices/F4.m4a`,
 		img: `${root}/asset/img/webp/scene_6.webp`,
-		devices: ['M4', 'M5', 'M6']
+		labels: [
+			{ id: 'M4', pos: { x: 30, y: 9, z: 30 } },
+			{ id: 'M5', pos: { x: 30, y: 0, z: 30 } },
+			{ id: 'M6', pos: { x: 30, y: -9, z: 30 } }
+		]
 	},
 	A_6: {
 		stt: '4_2',
 		name: 'Khu vực hệ thống tự động toàn Abbott (2/2)',
 		voice: ``,
 		img: `${root}/asset/img/webp/scene_7.webp`,
-		devices: []
+		labels: []
 	},
 	A_7: {
 		stt: '5',
 		name: 'Khu vực Elisa',
 		voice: `${root}/asset/voices/F5.m4a`,
 		img: `${root}/asset/img/webp/scene_8.webp`,
-		devices: ['M7']
+		labels: [{ id: 'M7', pos: { x: 30, y: 0, z: 30 } }]
 	},
 	A_8: {
 		stt: '6',
 		name: 'Phòng xét nghiệm sinh hóa và cặn nước tiểu',
 		voice: `${root}/asset/voices/F6.m4a`,
 		img: `${root}/asset/img/webp/scene_9.webp`,
-		devices: []
+		labels: []
 	},
 	A_9: {
 		stt: '7',
 		name: 'Phòng đọc kết quả Tế bào - Giải phẫu bệnh',
 		voice: `${root}/asset/voices/F7.m4a`,
 		img: `${root}/asset/img/webp/scene_10.webp`,
-		devices: []
+		labels: []
 	},
 	A_10: {
 		stt: '8_1',
 		name: 'Phòng huyết học (1/2)',
 		voice: `${root}/asset/voices/F8.m4a`,
 		img: `${root}/asset/img/webp/scene_11.webp`,
-		devices: ['M8', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15']
+		labels: [
+			{ id: 'M8', pos: { x: 30, y: 0, z: 30 } },
+			{ id: 'M9', pos: { x: 30, y: -9, z: 30 } },
+			{ id: 'M10', pos: { x: 30, y: -12, z: 30 } },
+			{ id: 'M11', pos: { x: 30, y: -15, z: 30 } },
+			{ id: 'M12', pos: { x: 30, y: -18, z: 30 } },
+			{ id: 'M13', pos: { x: 30, y: 12, z: 30 } },
+			{ id: 'M14', pos: { x: 30, y: 15, z: 30 } },
+			{ id: 'M15', pos: { x: 30, y: 18, z: 30 } }
+		]
 	},
 	A_11: {
 		stt: '8_2',
 		name: 'Phòng huyết học (2/2)',
 		voice: ``,
 		img: `${root}/asset/img/webp/scene_12.webp`,
-		devices: ['M8', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15']
+		labels: [
+			{ id: 'M8', pos: { x: 30, y: 0, z: 30 } },
+			{ id: 'M9', pos: { x: 30, y: -9, z: 30 } },
+			{ id: 'M10', pos: { x: 30, y: -12, z: 30 } },
+			{ id: 'M11', pos: { x: 30, y: -15, z: 30 } },
+			{ id: 'M12', pos: { x: 30, y: -18, z: 30 } },
+			{ id: 'M13', pos: { x: 30, y: 12, z: 30 } },
+			{ id: 'M14', pos: { x: 30, y: 15, z: 30 } },
+			{ id: 'M15', pos: { x: 30, y: 18, z: 30 } }
+		]
 	},
 	A_12: {
 		stt: '9',
 		name: 'Phòng tách chiết - Sinh học phân tử',
 		voice: `${root}/asset/voices/F12.m4a`,
 		img: `${root}/asset/img/webp/scene_16.webp`,
-		devices: []
+		labels: []
 	},
 	A_13: {
 		stt: '10',
 		name: 'Phòng PCR - Sinh học phân tử',
 		voice: `${root}/asset/voices/F10.m4a`,
 		img: `${root}/asset/img/webp/scene_14.webp`,
-		devices: []
+		labels: []
 	},
 	A_14: {
 		stt: '11',
 		name: 'Phòng sau PCR - Sinh học phân tử',
 		voice: `${root}/asset/voices/F11.m4a`,
 		img: `${root}/asset/img/webp/scene_15.webp`,
-		devices: ['M19', 'M20']
+		labels: [
+			{ id: 'M19', pos: { x: 30, y: 9, z: 30 } },
+			{ id: 'M20', pos: { x: 30, y: 0, z: 30 } }
+		]
 	},
 	A_15: {
 		stt: '12',
 		name: 'Phòng nuôi cấy tế bào, nhiễm sắc thể đồ - sinh học phân tử',
 		voice: `${root}/asset/voices/F13.m4a`,
 		img: `${root}/asset/img/webp/scene_17.webp`,
-		devices: []
+		labels: []
 	},
 	A_16: {
 		stt: '13',
 		name: 'Phòng tách chiết và giải trình tự GEN - sinh học phân tử',
 		voice: `${root}/asset/voices/F14.ogg`,
 		img: `${root}/asset/img/webp/scene_18.webp`,
-		devices: []
+		labels: []
 	},
 	A_17: {
 		stt: '14',
 		name: 'Phòng vi sinh ký sinh trùng',
 		voice: `${root}/asset/voices/F9.m4a`,
 		img: `${root}/asset/img/webp/scene_13.webp`,
-		devices: ['M16', 'M17', 'M18']
+		labels: [
+			{ id: 'M16', pos: { x: 30, y: 9, z: 30 } },
+			{ id: 'M17', pos: { x: 30, y: 0, z: 30 } },
+			{ id: 'M18', pos: { x: 30, y: -9, z: 30 } }
+		]
 	},
 	A_18: {
 		stt: '15',
 		name: 'Kho lưu mẫu sau phân tích',
 		voice: `${root}/asset/voices/F15.m4a`,
 		img: `${root}/asset/img/webp/scene_19.webp`,
-		devices: []
+		labels: []
 	}
 }
 

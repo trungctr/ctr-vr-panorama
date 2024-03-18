@@ -1,6 +1,6 @@
-﻿import App from './app.js'
+﻿import app from './app.js'
 import GLOBAL_ENV from './global.js'
-import ENV_driven from './environmentDriven.js'
+import ENV_driver from './environmentDriven.js'
 
 GLOBAL_ENV.bgm = document.getElementById('BGM-speaker')
 GLOBAL_ENV.sfx = document.getElementById('SFX-speaker')
@@ -38,9 +38,8 @@ GLOBAL_ENV.startButton.addEventListener('click', () => {
 
 if (GLOBAL_ENV.webGLcompatibility)
 {
-	const app = new App
-	// window.app = app
-	ENV_driven.drive(app)
+	const environmentDriven = new ENV_driver(app)
+	environmentDriven.drive()
 } else {
 	const warning = WebGLcheck.getWebGLErrorMessage()
 	document.getElementById('start-button').style.background = 'rgba(255,0,0,1)'

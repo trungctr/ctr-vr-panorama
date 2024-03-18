@@ -1,27 +1,40 @@
-﻿import * as THREE from '../three146/build/three.module.js'
-import { OrbitControls } from '../three146/examples/jsm/controls/OrbitControls.js'
-import { XRControllerModelFactory } from '../three146/examples/jsm/webxr/XRControllerModelFactory.js'
-import { CanvasUI } from '../canvas_gui/CanvasUI.js'
-import ENV_driven from './environmentDriven.js'
+﻿import * as THREE from '../three162/build/three.module.min.js'
+import { OrbitControls } from '../three162/addons/controls/OrbitControls.js'
+import { XRControllerModelFactory } from '../three162/addons/webxr/XRControllerModelFactory.js'
 import { Areas, Devices } from './data.js'
 import GLOBAL_ENV from './global.js'
-
-class App {
+import Action from './actions.js'
+import Control from './control/index.js'
+class Application {
 	constructor() {
+		this.actions = new Action(this)
+		this.controls = new Control(this)
 		/**
 		 * khởi tạo state
 		 */
 		const _THIS = this
 		this.GLOBAL_ENV = GLOBAL_ENV
 		this.state = {
-			currentLabel: []
+			areasArray: Object.keys(Areas),
+			areaNo: 0,
+			selectedObject: null,
+			labels: []
 		}
-
 		/*
 		 * tạo vùng chứa ứng dụng trên DOM
 		 */
 		const container = document.createElement('div')
 		document.body.appendChild(container)
+
+		/*
+		 * tạo background cho ứng dụng
+		 */
+		this.scene = new THREE.Scene()
+		// this.scene.background = new THREE.Color(0x000000)
+		this.scene.background = new THREE.TextureLoader().load(
+			Areas[this.state.areasArray[this.state.areaNo]].img
+		)
+		this.scene.background.mapping = THREE.EquirectangularReflectionMapping
 
 		/*
 		 * tạo camera ảo
@@ -30,24 +43,17 @@ class App {
 			60,
 			window.innerWidth / window.innerHeight,
 			0.1,
-			500
+			1000
 		)
 		this.camera.position.set(0.001, 0, 0.001)
 		this.camera.lookAt(1, 0, 1)
-
-		/*
-		 * tạo background cho ứng dụng
-		 */
-		this.scene = new THREE.Scene()
-		// this.scene.background = new THREE.Color(0x000000)
-		this.scene.background = new THREE.TextureLoader().load(Areas.A_3.img)
-		this.scene.background.mapping = THREE.EquirectangularReflectionMapping
+		this.scene.add(this.camera)
 
 		/*
 		 * tạo ánh sáng môi trường
 		 */
-		const ambient = new THREE.AmbientLight(0x404040, 4) // soft white light
-		this.scene.add(ambient)
+		// const ambient = new THREE.AmbientLight(0x404040, 0) // soft white light
+		// this.scene.add(ambient)
 
 		/*
 		 * nguồn sáng định hướng
@@ -80,100 +86,38 @@ class App {
 		 */
 		// track group
 		this.trackGroup = new THREE.Group()
+		this.trackGroup.name = 'trackGroup'
+
+		//HUD group
+		this.hudGroup = new THREE.Group()
+		this.hudGroup.name = 'HUD'
+
+		// origin box
+		if (this.GLOBAL_ENV.developing) {
+			const boxGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1)
+			const boxMaterial = new THREE.MeshStandardMaterial({
+				color: 0x00ff00
+			})
+			const box = new THREE.Mesh(boxGeometry, boxMaterial)
+			box.position.set(1, 0, 1)
+			this.trackGroup.add(box)
+		}
 
 		//#ref  reference sphere
-		const sphereGeometry = new THREE.SphereGeometry(100, 100, 10)
+		const sphereGeometry = new THREE.SphereGeometry(100, 100, 100)
 		const sphereMaterial = new THREE.MeshStandardMaterial({
 			color: 0x000000,
-			side: THREE.BackSide,
-			wireframe: true,
-			map: '',
-			visible: false
+			wireframe: true
 		})
-		if (this.GLOBAL_ENV.developing) {
-			sphereMaterial.visible = true
-		}
+		sphereMaterial.visible = this.GLOBAL_ENV.developing
 		this.refSphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
 		this.refSphere.position.set(0, 0, 0)
 		this.refSphere.name = 'snap'
-		this.refSphere.castShadow = false
+		this.refSphere.castShadow = true
 		this.trackGroup.add(this.refSphere)
 
 		// add sprite labels
-		let deviceList = Areas.A_3.devices
-		let deviceInfo = Devices
-		let deviceArray = Object.keys(deviceList)
-		for (let i = 0; i < deviceArray.length; i++) {
-			var canvas = document.createElement('canvas'),
-				context = canvas.getContext('2d'),
-				metrics = null,
-				textHeight = 100,
-				textWidth = 0,
-				actualFontSize = 2
-
-			context.font = 'normal ' + textHeight + 'px Arial'
-			metrics = context.measureText(
-				'__' + deviceInfo[deviceArray[i]].name + '__'
-			)
-			var textWidth = metrics.width
-
-			canvas.width = textWidth
-			canvas.height = textHeight + 0.5 * textHeight
-
-			context.font = 'normal ' + textHeight + 'px Arial'
-			context.textAlign = 'center'
-			context.textBaseline = 'middle'
-			context.fillStyle = '#fff'
-			context.fillText(
-				deviceInfo[deviceArray[i]].name,
-				canvas.width / 2,
-				canvas.height / 2
-			)
-			context.globalCompositeOperation = 'destination-over'
-			context.fillStyle = '#0000ff'
-			context.fillRect(0, 0, canvas.width, canvas.height)
-
-			var texture = new THREE.Texture(canvas)
-			texture.needsUpdate = true
-
-			var smaterial = new THREE.SpriteMaterial({
-				map: texture
-				// alignment: THREE.SpriteAlignment.center
-			})
-			smaterial.transparent = true
-
-			var textObject = new THREE.Mesh()
-			var sprite = new THREE.Sprite(smaterial)
-			textObject.textHeight = actualFontSize
-			textObject.textWidth = (textWidth / textHeight) * textObject.textHeight
-			if (textObject == '2d') {
-				sprite.scale.set(
-					textObject.textWidth / textWidth,
-					textObject.textHeight / textHeight
-				)
-			} else {
-				sprite.scale.set(
-					(textWidth / textHeight) * actualFontSize,
-					actualFontSize + 0.5 * actualFontSize,
-					1
-				)
-			}
-
-			// textObject.add(sprite)
-			// textObject.position.set(
-			// 	deviceList[deviceArray[i]].pos.x,
-			// 	deviceList[deviceArray[i]].pos.y,
-			// 	deviceList[deviceArray[i]].pos.z
-			// )
-			// this.trackGroup.add(textObject)
-			sprite.add(textObject)
-			sprite.position.set(
-				deviceList[deviceArray[i]].pos.x,
-				deviceList[deviceArray[i]].pos.y,
-				deviceList[deviceArray[i]].pos.z
-			)
-			this.trackGroup.add(sprite)
-		}
+		this.actions.putLabels(this.state.areasArray[this.state.areaNo])
 
 		this.scene.add(this.trackGroup)
 		/*
@@ -185,6 +129,7 @@ class App {
 		this.renderer.setPixelRatio(window.devicePixelRatio)
 		// thiết lập kích thước cửa sổ ứng dụng; đang thiết lập full màn hình
 		this.renderer.setSize(window.innerWidth, window.innerHeight)
+		this.renderer.autoClear = false
 		// thêm của sổ ứng dụng vào vùng chứa được tạo trước đó
 		container.appendChild(this.renderer.domElement)
 		/*
@@ -192,18 +137,59 @@ class App {
 		 * để những thay đổi về vị trí camera và đối tượng trong cảnh được cập nhật liên tục
 		 * chúng ta có thể thiết lập vòng lặp hoạt ảnh để thực hiện việc đó.
 		 */
+		//HUD
+		this.sceneHUD = new THREE.Scene()
+		const width = window.innerWidth
+		const height = window.innerHeight
+		this.cameraOrtho = new THREE.OrthographicCamera(
+			width / -2,
+			width / 2,
+			height / 2,
+			height / -2,
+			0,
+			3
+		)
+		this.cameraOrtho.position.z = 1
+		this.sceneHUD.add(this.cameraOrtho)
+		this.cameraOrtho.updateProjectionMatrix()
+
 		this.renderer.setAnimationLoop(this.render.bind(_THIS))
 	}
 
 	resize() {
+		const width = window.innerWidth
+		const height = window.innerHeight
 		this.camera.aspect = window.innerWidth / window.innerHeight
 		this.camera.updateProjectionMatrix()
 		this.renderer.setSize(window.innerWidth, window.innerHeight)
+
+		this.cameraOrtho.left = -width / 2
+		this.cameraOrtho.right = width / 2
+		this.cameraOrtho.top = height / 2
+		this.cameraOrtho.bottom = -height / 2
+		this.cameraOrtho.updateProjectionMatrix()
 	}
 
-	action() {}
+	action() {
+		this.trackGroup.position.copy(this.camera.position)
+		this.cameraControls.target.set(
+			this.trackGroup.position.x + 0.001,
+			this.trackGroup.position.y,
+			this.trackGroup.position.z + 0.001
+		)
+		this.camera.lookAt(
+			this.cameraControls.target.x,
+			this.cameraControls.target.y,
+			this.cameraControls.target.z
+		)
+	}
+
 	render() {
+		// this.renderer.render(this.scene, this.camera)
+		this.renderer.clear()
 		this.renderer.render(this.scene, this.camera)
+		this.renderer.clearDepth()
+		this.renderer.render(this.sceneHUD, this.cameraOrtho)
 	}
 
 	VRrender() {
@@ -259,20 +245,72 @@ class App {
 		//Theo dõi sự thay đổi kích thước cửa sổ và cập nhật kích thước vùng chứa
 		window.addEventListener('resize', this.resize.bind(_THIS))
 		//hàm điều khiển camera
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-		// this.clock = new THREE.Clock()
-		// this.controls.target.set(
-		// 	this.refSphere.position.x,
-		// 	this.refSphere.position.y,
-		// 	this.refSphere.position.z
-		// )
-		// this.controls.update()
+		this.cameraControls = new OrbitControls(
+			this.camera,
+			this.renderer.domElement
+		)
 
+		//HUD
+		let spriteTL, spriteTR, spriteBL, spriteBR, spriteC
+		function createHUDSprites(t) {
+			t.colorSpace = THREE.SRGBColorSpace
+
+			const material = new THREE.SpriteMaterial({ map: t })
+			const width = material.map.image.width
+			const height = material.map.image.height
+
+			spriteTL = new THREE.Sprite(material)
+			spriteTL.center.set(0.0, 1.0)
+			spriteTL.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteTL)
+
+			spriteTR = new THREE.Sprite(material)
+			spriteTR.center.set(1.0, 1.0)
+			spriteTR.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteTR)
+
+			spriteBL = new THREE.Sprite(material)
+			spriteBL.center.set(0.0, 0.0)
+			spriteBL.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteBL)
+
+			spriteBR = new THREE.Sprite(material)
+			spriteBR.center.set(1.0, 0.0)
+			spriteBR.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteBR)
+
+			spriteC = new THREE.Sprite(material)
+			spriteC.center.set(0.5, 0.5)
+			spriteC.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteC)
+
+			updateHUDSprites()
+		}
+
+		function updateHUDSprites() {
+			const width = window.innerWidth / 2
+			const height = window.innerHeight / 2
+
+			spriteTL.position.set(-width, height, 1) // top left
+			spriteTR.position.set(width, height, 1) // top right
+			spriteBL.position.set(-width, -height, 1) // bottom left
+			spriteBR.position.set(width, -height, 1) // bottom right
+			spriteC.position.set(0, 0, 1) // center
+		}
+
+		const textureLoader = new THREE.TextureLoader()
+		textureLoader.load('../asset/textures/sprite0.png', (t) =>
+			createHUDSprites(t)
+		)
 		//-------------------------------------------------------
 		this.action()
+		//them trinh dieu khien
+		this.controls.pointer()
+		this.controls.Keyboard()
 		//-------------------------------
 		this.render()
 	}
 }
 
-export default App
+const app = new Application()
+export default app

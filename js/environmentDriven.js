@@ -2,96 +2,116 @@
  * @method drive environment depend on compatibility}
  * @param main type=object - the main thread to run
  */
-class ENV_driven {
-	static drive(main) {
-		function showEnterVR(/*device*/) {
-			let currentSession = null
+class ENV_driver {
+	constructor(main) {
+		this.log = main.GLOBAL_ENV.devLog
+		this.isOculus = main.GLOBAL_ENV.isOculus
+		this.currentSession = null
+		this.xrSessionIsGranted = false
+		this.main = main
+		this.startButton = main.GLOBAL_ENV.startButton
+	}
 
-			async function onSessionStarted(session) {
-				session.addEventListener('end', onSessionEnded)
+	turnToVR() {
+		const _THIS = this
+		// showEnterVR(/*device*/)
+		async function onSessionStarted(session) {
+			session.addEventListener('end', onSessionEnded)
 
-				await main.renderer.xr.setSession(session)
-				console.log('VR session started !!')
-				currentSession = session
-			}
+			await _THIS.main.renderer.xr.setSession(session)
+			_THIS.log.info('VR session started !!')
+			_THIS.currentSession = session
+		}
 
-			function onSessionEnded(/*event*/) {
-				currentSession.removeEventListener('end', onSessionEnded)
-				console.log('VR session ended !!')
-				currentSession = null
-			}
+		function onSessionEnded(/*event*/) {
+			_THIS.turnToWebGL()
+			_THIS.currentSession.removeEventListener('end', onSessionEnded)
+			_THIS.log.info('VR session ended !!')
+			_THIS.currentSession = null
+		}
 
-			main.GLOBAL_ENV.startButton.style.backgroundColor = 'rgba(0,200,0,0.8)'
-			main.GLOBAL_ENV.startButton.textContent = 'BẮT ĐẦU THAM QUAN'
-			main.GLOBAL_ENV.startButton.onclick = function () {
-				if (currentSession === null) {
-					// WebXR's requestReferenceSpace only works if the corresponding feature
-					// was requested at session creation time. For simplicity, just ask for
-					// the interesting ones as optional features, but be aware that the
-					// requestReferenceSpace call will fail if it turns out to be unavailable.
-					// ('local' is always available for immersive sessions and doesn't need to
-					// be requested separately.)
-					main.VRrender()
-					const sessionInit = {
-						optionalFeatures: [
-							'local-floor'
-							// 'bounded-floor',
-							// 'hand-tracking',
-							// 'layers'
-						]
-					}
-					navigator.xr
-						.requestSession('immersive-vr', sessionInit)
-						.then(onSessionStarted)
-				} else {
-					currentSession.end()
+		_THIS.startButton.style.backgroundColor = 'rgba(0,200,0,0.8)'
+		_THIS.startButton.textContent = 'BẮT ĐẦU THAM QUAN'
+		_THIS.startButton.onclick = function () {
+			if (_THIS.currentSession === null) {
+				// WebXR's requestReferenceSpace only works if the corresponding feature
+				// was requested at session creation time. For simplicity, just ask for
+				// the interesting ones as optional features, but be aware that the
+				// requestReferenceSp_THISrns out to be unavailable.
+				// ('local' is always available for immersive sessions and doesn't need to
+				// be requested separately.)
+				_THIS.main.VRrender()
+				const sessionInit = {
+					optionalFeatures: [
+						'local-floor',
+						'bounded-floor',
+						'hand-tracking',
+						'layers'
+					]
 				}
+				navigator.xr
+					.requestSession('immersive-vr', sessionInit)
+					.then(onSessionStarted)
+			} else {
+				_THIS.currentSession.end()
 			}
 		}
+	}
 
-		function turnToWebGL() {
-			main.GLOBAL_ENV.startButton.style.background = 'rgba(0,0,255,0.8)'
-			main.GLOBAL_ENV.startButton.textContent = 'BẮT ĐẦU THAM QUAN'
-			main.GLOBAL_ENV.startButton.onclick = () => {
-				main.WebGLrender()
-			}
-			console.log('Using WebGL')
+	turnToWebGL() {
+		const _THIS = this
+		_THIS.startButton.style.background = 'rgba(0,0,255,0.8)'
+		_THIS.startButton.textContent = 'BẮT ĐẦU THAM QUAN'
+		_THIS.startButton.onclick = () => {
+			_THIS.main.WebGLrender()
 		}
+		_THIS.log.info('Using WebGL')
+	}
 
-		function showWebXRNotFound() {
-			turnToWebGL()
+	VRNotAllowed(exception) {
+		const _THIS = this
+		_THIS.turnToWebGL()
+		_THIS.log.error(
+			'Exception when trying to call xr.isSessionSupported, turn to WebGL',
+			exception
+		)
+	}
+
+	registerSessionGrantedListener() {
+		const _THIS = this
+		if (_THIS.isOculus && 'xr' in navigator) {
+			// WebXRViewer (based on Firefox) has a bug where addEventListener
+			// throws a silent exception and aborts execution entirely.
+			if (/WebXRViewer\//i.test(navigator.userAgent)) return
+
+			navigator.xr.addEventListener('sessiongranted', () => {
+				_THIS.xrSessionIsGranted = true
+			})
 		}
+	}
 
-		function showVRNotAllowed(exception) {
-			turnToWebGL()
-			console.warn(
-				'Exception when trying to call xr.isSessionSupported, turn to WebGL',
-				exception
-			)
-		}
-
-		if (
-			main.GLOBAL_ENV.isOculus
-			// 'xr' in navigator
-		) {
+	drive() {
+		//code thread start here
+		const _THIS = this
+		_THIS.registerSessionGrantedListener()
+		if (_THIS.isOculus) {
 			// turnToWebGL()
-
 			navigator.xr
 				.isSessionSupported('immersive-vr')
 				.then(function (supported) {
 					const condition = supported
 
-					condition ? showEnterVR() : showWebXRNotFound()
+					condition ? this.turnToVR() : this.turnToWebGL()
 
-					if (condition && ENV_driven.xrSessionIsGranted) {
-						main.GLOBAL_ENV.startButton.click()
+					if (condition && _THIS.xrSessionIsGranted) {
+						_THIS.startButton.click()
 					}
 				})
-				.catch((e) => showVRNotAllowed())
+				.catch((e) => _THIS.VRNotAllowed())
 
-			return main.GLOBAL_ENV.startButton
+			return _THIS.startButton
 		} else {
-			if (window.isSecureContext === false) {
+			if (window.isSecureContext === false && _THIS.isOculus) {
 				var result = confirm(
 					'WEBXR cần HTTPS Bạn có muốn chuyển sang HTTPS?'
 				)
@@ -100,33 +120,18 @@ class ENV_driven {
 						document.location.href.replace(/^http:/, 'https:')
 					)
 				} else {
-					turnToWebGL()
+					_THIS.turnToWebGL()
 				}
 			} else {
-				main.GLOBAL_ENV.devLog.error('WEBXR NOT AVAILABLE: <a href="https://immersiveweb.dev/">https://immersiveweb.dev/</a>')
+				_THIS.log.error(
+					'WEBXR NOT AVAILABLE: <a href="https://immersiveweb.dev/">https://immersiveweb.dev/</a>'
+				)
+				_THIS.turnToWebGL()
 			}
-			turnToWebGL(main.GLOBAL_ENV.startButton)
-
 			return 0
-		}
-	}
-
-	static xrSessionIsGranted = false
-
-	static registerSessionGrantedListener() {
-		if ('xr' in navigator) {
-			// WebXRViewer (based on Firefox) has a bug where addEventListener
-			// throws a silent exception and aborts execution entirely.
-			if (/WebXRViewer\//i.test(navigator.userAgent)) return
-
-			navigator.xr.addEventListener('sessiongranted', () => {
-				ENV_driven.xrSessionIsGranted = true
-			})
 		}
 	}
 }
 
-ENV_driven.registerSessionGrantedListener()
-
-export default ENV_driven
+export default ENV_driver
 

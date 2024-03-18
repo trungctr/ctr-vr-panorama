@@ -2,5 +2,6 @@
 	"liveServer.settings.port": 5501,
 	"cSpell.words": [
 		"Equirectangular"
-	]
+	],
+	"window.autoDetectColorScheme": true
 }

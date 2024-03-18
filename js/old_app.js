@@ -1,4 +1,4 @@
-﻿import * as THREE from '../three146/build/three.module.js'
+﻿import * as THREE from '../three162/build/three.module.js'
 import { OrbitControls } from '../three146/examples/jsm/controls/OrbitControls.js'
 import { RGBELoader } from '../three146/examples/jsm/loaders/RGBELoader.js'
 import { XRControllerModelFactory } from '../three146/examples/jsm/webxr/XRControllerModelFactory.js'
