@@ -69,7 +69,7 @@
 	}
 	GLOBAL_ENV.isOculus = isOculus()
 	GLOBAL_ENV.devLog.info('0.isOculus = ' + GLOBAL_ENV.isOculus)
-	GLOBAL_ENV.devLog.info('1.Version = ' + GLOBAL_ENV.version)
+	GLOBAL_ENV.devLog.info(`1.Version ${GLOBAL_ENV.version} (build ${GLOBAL_ENV.build})`)
 })()
 
 export default GLOBAL_ENV

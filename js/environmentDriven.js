@@ -94,6 +94,7 @@ class ENV_driver {
 		//code thread start here
 		const _THIS = this
 		_THIS.registerSessionGrantedListener()
+		_THIS.log.info(`2. Env driven claim isOculus = ${_THIS.isOculus}`)
 		if (_THIS.isOculus) {
 			// turnToWebGL()
 			navigator.xr
@@ -126,8 +127,8 @@ class ENV_driver {
 				_THIS.log.error(
 					'WEBXR NOT AVAILABLE: <a href="https://immersiveweb.dev/">https://immersiveweb.dev/</a>'
 				)
-				_THIS.turnToWebGL()
 			}
+			_THIS.turnToWebGL()
 			return 0
 		}
 	}

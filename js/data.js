@@ -6,7 +6,9 @@ export const Areas = {
 		name: 'Khu nhận mẫu ban đầu',
 		voice: `${root}/asset/voices/F2.m4a`,
 		img: `${root}/asset/img/webp/scene_1.webp`,
-		labels: []
+		labels: [ //this is fake data for demo purposes
+			{ id: 'M0', pos: { x: 30, y: 0, z: 30 } },
+		]
 	},
 	A_2: {
 		stt: '3_1',
@@ -166,6 +168,11 @@ export const Areas = {
 }
 
 export const Devices = {
+	M0: {
+		name: 'Sample inlet dept',
+		voice: `${root}/asset/voices/M1.m4a`,
+		text: `Claim the sample`
+	},
 	M1: {
 		name: 'Hệ thống Cobas 8100',
 		voice: `${root}/asset/voices/M1.m4a`,
