@@ -79,7 +79,7 @@ class ENV_driver {
 
 	registerSessionGrantedListener() {
 		const _THIS = this
-		if (_THIS.isOculus && 'xr' in navigator) {
+		if ('xr' in navigator) {
 			// WebXRViewer (based on Firefox) has a bug where addEventListener
 			// throws a silent exception and aborts execution entirely.
 			if (/WebXRViewer\//i.test(navigator.userAgent)) return
