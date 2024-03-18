@@ -208,7 +208,7 @@ class Application {
 		}
 
 		const textureLoader = new THREE.TextureLoader()
-		textureLoader.load('../asset/textures/sprite0.png', (t) =>
+		textureLoader.load('./asset/textures/sprite0.png', (t) =>
 			createHUDSprites(t)
 		)
 		//================================================================
