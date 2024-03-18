@@ -41,7 +41,6 @@ if (GLOBAL_ENV.webGLcompatibility)
 	const environmentDriven = new ENV_driver(app)
 	environmentDriven.drive()
 } else {
-	const warning = WebGLcheck.getWebGLErrorMessage()
 	document.getElementById('start-button').style.background = 'rgba(255,0,0,1)'
 	document.getElementById('start-button').innerText =
 		'TRÌNH DUYỆT KHÔNG TƯƠNG THÍCH'

@@ -4,17 +4,18 @@
  */
 class ENV_driver {
 	constructor(main) {
-		this.log = main.GLOBAL_ENV.devLog
-		this.isOculus = main.GLOBAL_ENV.isOculus
+		this.log = main.log
+		this.isOculus = main.isOculus
 		this.currentSession = null
 		this.xrSessionIsGranted = false
 		this.main = main
-		this.startButton = main.GLOBAL_ENV.startButton
+		this.startButton = main.startButton
 	}
 
 	turnToVR() {
 		const _THIS = this
 		// showEnterVR(/*device*/)
+		_THIS.isOculus = false
 		async function onSessionStarted(session) {
 			session.addEventListener('end', onSessionEnded)
 
@@ -60,6 +61,7 @@ class ENV_driver {
 
 	turnToWebGL() {
 		const _THIS = this
+		_THIS.isOculus = false
 		_THIS.startButton.style.background = 'rgba(0,0,255,0.8)'
 		_THIS.startButton.textContent = 'BẮT ĐẦU THAM QUAN'
 		_THIS.startButton.onclick = () => {
@@ -72,8 +74,8 @@ class ENV_driver {
 		const _THIS = this
 		_THIS.turnToWebGL()
 		_THIS.log.error(
-			'Exception when trying to call xr.isSessionSupported, turn to WebGL \n'+
-			exception
+			'Exception when trying to call xr.isSessionSupported, turn to WebGL \n' +
+				exception
 		)
 	}
 
@@ -102,7 +104,7 @@ class ENV_driver {
 				.then(function (supported) {
 					const condition = supported
 
-					condition ? this.turnToVR() : this.turnToWebGL()
+					condition ? _THIS.turnToVR() : _THIS.turnToWebGL()
 
 					if (condition && _THIS.xrSessionIsGranted) {
 						_THIS.startButton.click()
@@ -135,4 +137,5 @@ class ENV_driver {
 }
 
 export default ENV_driver
+
 

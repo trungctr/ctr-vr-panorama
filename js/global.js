@@ -1,10 +1,10 @@
 ﻿const GLOBAL_ENV = {
 	version: '0.1.0',
-	build: '18.03.24.2247',
+	build: '18.03.24.2326',
 	isOculus: false,
 	webGLcompatibility: false,
+	overWriteEnv: false,
 	developing: true,
-	moveSpeed: 0.5,
 	startButton: document.getElementById('start-button'),
 	bgm: document.getElementById('BGM-speaker'),
 	sfx: document.getElementById('SFX-speaker'),
@@ -67,9 +67,16 @@
 			return navigator.userAgent.match(toMatchItem)
 		})
 	}
-	GLOBAL_ENV.isOculus = isOculus()
+	if (!GLOBAL_ENV.overWriteEnv) {
+		GLOBAL_ENV.isOculus = isOculus()
+	} else
+	{
+		GLOBAL_ENV.isOculus = GLOBAL_ENV.overWriteEnv
+	}
 	GLOBAL_ENV.devLog.info('0.isOculus = ' + GLOBAL_ENV.isOculus)
-	GLOBAL_ENV.devLog.info(`1.Version ${GLOBAL_ENV.version} (build ${GLOBAL_ENV.build})`)
+	GLOBAL_ENV.devLog.info(
+		`1.Version ${GLOBAL_ENV.version} (build ${GLOBAL_ENV.build})`
+	)
 })()
 
 export default GLOBAL_ENV

@@ -13,7 +13,11 @@ class Application {
 		 * khởi tạo state
 		 */
 		const _THIS = this
-		this.GLOBAL_ENV = GLOBAL_ENV
+		this.log = GLOBAL_ENV.devLog
+		this.isOculus = GLOBAL_ENV.isOculus
+		this.isDeveloping = GLOBAL_ENV.developing
+		this.startButton = GLOBAL_ENV.startButton
+
 		this.state = {
 			areasArray: Object.keys(Areas),
 			areaNo: 0,
@@ -67,7 +71,7 @@ class Application {
 		 */
 		// axis helper, x red, y green, z blue
 
-		if (this.GLOBAL_ENV.developing) {
+		if (this.isDeveloping) {
 			const axesHelper = new THREE.AxesHelper(100)
 			axesHelper.setColors(0xff0000, 0x00ff00, 0x0000ff)
 			axesHelper.updateMatrixWorld()
@@ -75,7 +79,7 @@ class Application {
 		}
 
 		//grid helper
-		if (this.GLOBAL_ENV.developing) {
+		if (this.isDeveloping) {
 			const gridsHelper = new THREE.GridHelper(30, 30)
 			gridsHelper.updateMatrixWorld()
 			this.scene.add(gridsHelper)
@@ -93,7 +97,7 @@ class Application {
 		this.hudGroup.name = 'HUD'
 
 		// origin box
-		if (this.GLOBAL_ENV.developing) {
+		if (this.isDeveloping) {
 			const boxGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1)
 			const boxMaterial = new THREE.MeshStandardMaterial({
 				color: 0x00ff00
@@ -109,7 +113,7 @@ class Application {
 			color: 0x000000,
 			wireframe: true
 		})
-		sphereMaterial.visible = this.GLOBAL_ENV.developing
+		sphereMaterial.visible = this.isDeveloping
 		this.refSphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
 		this.refSphere.position.set(0, 0, 0)
 		this.refSphere.name = 'snap'
@@ -129,7 +133,9 @@ class Application {
 		this.renderer.setPixelRatio(window.devicePixelRatio)
 		// thiết lập kích thước cửa sổ ứng dụng; đang thiết lập full màn hình
 		this.renderer.setSize(window.innerWidth, window.innerHeight)
-		this.renderer.autoClear = false
+		if (!this.isOculus) {
+			this.renderer.autoClear = false
+		}
 		// thêm của sổ ứng dụng vào vùng chứa được tạo trước đó
 		container.appendChild(this.renderer.domElement)
 		/*
@@ -147,12 +153,65 @@ class Application {
 			height / 2,
 			height / -2,
 			0,
-			3
+			1000
 		)
-		this.cameraOrtho.position.z = 1
+		this.cameraOrtho.position.z = 100
 		this.sceneHUD.add(this.cameraOrtho)
 		this.cameraOrtho.updateProjectionMatrix()
 
+		//HUD
+		let spriteTL, spriteTR, spriteBL, spriteBR, spriteC
+		function createHUDSprites(t) {
+			t.colorSpace = THREE.SRGBColorSpace
+
+			const material = new THREE.SpriteMaterial({ map: t })
+			const width = material.map.image.width
+			const height = material.map.image.height
+
+			spriteTL = new THREE.Sprite(material)
+			spriteTL.center.set(0.0, 1.0)
+			spriteTL.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteTL)
+
+			spriteTR = new THREE.Sprite(material)
+			spriteTR.center.set(1.0, 1.0)
+			spriteTR.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteTR)
+
+			spriteBL = new THREE.Sprite(material)
+			spriteBL.center.set(0.0, 0.0)
+			spriteBL.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteBL)
+
+			spriteBR = new THREE.Sprite(material)
+			spriteBR.center.set(1.0, 0.0)
+			spriteBR.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteBR)
+
+			spriteC = new THREE.Sprite(material)
+			spriteC.center.set(0.5, 0.5)
+			spriteC.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteC)
+
+			updateHUDSprites()
+		}
+
+		function updateHUDSprites() {
+			const width = window.innerWidth / 2
+			const height = window.innerHeight / 2
+
+			spriteTL.position.set(-width, height, 1) // top left
+			spriteTR.position.set(width, height, 1) // top right
+			spriteBL.position.set(-width, -height, 1) // bottom left
+			spriteBR.position.set(width, -height, 1) // bottom right
+			spriteC.position.set(0, 0, 1) // center
+		}
+
+		const textureLoader = new THREE.TextureLoader()
+		textureLoader.load('../asset/textures/sprite0.png', (t) =>
+			createHUDSprites(t)
+		)
+		//================================================================
 		this.renderer.setAnimationLoop(this.render.bind(_THIS))
 	}
 
@@ -172,24 +231,29 @@ class Application {
 
 	action() {
 		this.trackGroup.position.copy(this.camera.position)
-		this.cameraControls.target.set(
-			this.trackGroup.position.x + 0.001,
-			this.trackGroup.position.y,
-			this.trackGroup.position.z + 0.001
-		)
-		this.camera.lookAt(
-			this.cameraControls.target.x,
-			this.cameraControls.target.y,
-			this.cameraControls.target.z
-		)
+		if (!this.isOculus) {
+			this.cameraControls.target.set(
+				this.trackGroup.position.x + 0.001,
+				this.trackGroup.position.y,
+				this.trackGroup.position.z + 0.001
+			)
+			this.camera.lookAt(
+				this.cameraControls.target.x,
+				this.cameraControls.target.y,
+				this.cameraControls.target.z
+			)
+		}
 	}
 
 	render() {
-		// this.renderer.render(this.scene, this.camera)
-		this.renderer.clear()
-		this.renderer.render(this.scene, this.camera)
-		this.renderer.clearDepth()
-		this.renderer.render(this.sceneHUD, this.cameraOrtho)
+		if (this.isOculus) {
+			this.renderer.render(this.scene, this.camera)
+		} else {
+			this.renderer.clear()
+			this.renderer.render(this.scene, this.camera)
+			this.renderer.clearDepth()
+			this.renderer.render(this.sceneHUD, this.cameraOrtho)
+		}
 	}
 
 	VRrender() {
@@ -250,58 +314,6 @@ class Application {
 			this.renderer.domElement
 		)
 
-		//HUD
-		let spriteTL, spriteTR, spriteBL, spriteBR, spriteC
-		function createHUDSprites(t) {
-			t.colorSpace = THREE.SRGBColorSpace
-
-			const material = new THREE.SpriteMaterial({ map: t })
-			const width = material.map.image.width
-			const height = material.map.image.height
-
-			spriteTL = new THREE.Sprite(material)
-			spriteTL.center.set(0.0, 1.0)
-			spriteTL.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteTL)
-
-			spriteTR = new THREE.Sprite(material)
-			spriteTR.center.set(1.0, 1.0)
-			spriteTR.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteTR)
-
-			spriteBL = new THREE.Sprite(material)
-			spriteBL.center.set(0.0, 0.0)
-			spriteBL.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteBL)
-
-			spriteBR = new THREE.Sprite(material)
-			spriteBR.center.set(1.0, 0.0)
-			spriteBR.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteBR)
-
-			spriteC = new THREE.Sprite(material)
-			spriteC.center.set(0.5, 0.5)
-			spriteC.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteC)
-
-			updateHUDSprites()
-		}
-
-		function updateHUDSprites() {
-			const width = window.innerWidth / 2
-			const height = window.innerHeight / 2
-
-			spriteTL.position.set(-width, height, 1) // top left
-			spriteTR.position.set(width, height, 1) // top right
-			spriteBL.position.set(-width, -height, 1) // bottom left
-			spriteBR.position.set(width, -height, 1) // bottom right
-			spriteC.position.set(0, 0, 1) // center
-		}
-
-		const textureLoader = new THREE.TextureLoader()
-		textureLoader.load('../asset/textures/sprite0.png', (t) =>
-			createHUDSprites(t)
-		)
 		//-------------------------------------------------------
 		this.action()
 		//them trinh dieu khien
