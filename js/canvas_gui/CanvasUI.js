@@ -1,7 +1,5 @@
 import {
 	Mesh,
-	SpriteMaterial,
-	Sprite,
 	CanvasTexture,
 	MeshBasicMaterial,
 	PlaneGeometry,
@@ -10,81 +8,101 @@ import {
 	Scene,
 	WebGLRenderer,
 	Vector3,
-	IcosahedronBufferGeometry,
+	//three.module.js:49809 THREE.IcosahedronBufferGeometry has been renamed to THREE.IcosahedronGeometry.
+	//IcosahedronBufferGeometry,
+	IcosahedronGeometry,
 	Color
-} from '../../three146/build/three.module.js'
+} from '../../three162/build/three.module.js'
 
 import { CanvasKeyboard } from './CanvasKeyboard.js'
 import { CanvasColorPicker } from './CanvasColorPicker.js'
 import { CanvasSlider } from './CanvasSlider.js'
 
-/*An element is defined by 
-type: text | button | image | shape
-hover: hex
-active: hex
-position: x, y, left, right, top, bottom
-width: pixels, will inherit from body if missing
-height: pixels, will inherit from body if missing
-overflow: fit | scroll | hidden
-textAlign: center | left | right
-fontSize: pixels
-fontColor: hex
-fontFamily: string
-padding: pixels
-backgroundColor: hex
-borderRadius: pixels
-clipPath: svg path
-border: width color style
-*/
+/**
+ * CanvasUI
+ * @author Nicholas Lever
+ * @refresh by TrungCTR
+ * This is the class to make GUI in three js library, each GUI manager like a panel and it's elements
+ * @constructor contain two parameters: content, configuration
+ * @param {Object}content type = Object, this is the object containing content of each element in the panel
+ * @param {Object}configuration type = Object, this is the object containing configuration of panel and each element in the panel, this Object must have 2 properties: renderer, scene
+ * @example let myGUI  = new CanvasGUI(myContent, myConfig);
+ * @example let myConfig = {panelSize: { width: 1, height: 1 }, renderer: app.renderer, scene: app.scene, width: 512, height: 512, opacity: 0.7, title: {type:'text', fontFamily: 'Arial', fontSize: 30, padding: 10, backgroundColor: '#000', fontColor:'#fff'}, content:{type:'text', fontFamily: 'Arial', fontSize: 16, padding: 20, backgroundColor: '#000', fontColor: '#fff'}, accept:{type:'button', fontFamily: 'Arial', fontSize:16, borderRadius:10, padding: 10}}
+ * @example let myContent = {title:'this is the title', content:'This is the content', accept:'OK'}
+ * @scene {Object} the scene of application that contain this panel
+ * @renderer {Object} the renderer of application
+ * @method setPosition(x,y,z) set the position of the panel; x,y,z is number
+ * @method setRotation(x,y,z) set the rotation of the panel; x,y,z is number
+ * @param {object}configuration defined by one or many children Object, each Object is one element
+ * @param type text | button | image | shape | slider
+ * @param hover  hex
+ * @param active  hex
+ * @param position  x, y, left, right, top, bottom
+ * @param width pixels, will inherit from body if missing
+ * @param height pixels, will inherit from body if missing
+ * @param overflow fit | scroll | hidden
+ * @param textAlign center | left | right
+ * @param fontSize pixels
+ * @param fontColor hex
+ * @param fontFamily string
+ * @param padding pixels
+ * @param backgroundColor hex
+ * @param borderRadius pixels
+ * @param clipPath svg path -- note: all command in path must be in upper case
+ * @param border width color style
+ */
 class CanvasUI {
 	constructor(content, config) {
-		const defaultconfig = {
+		const defaultConfig = {
 			panelSize: { width: 1, height: 1 },
 			width: 512,
 			height: 512,
-			opacity: 0.7,
+			opacity: 1,
+			borderRadius: 0,
 			body: {
+				type: 'text',
 				fontFamily: 'Arial',
-				fontSize: 30,
-				padding: 20,
-				backgroundColor: '#000',
-				fontColor: '#fff',
-				borderRadius: 0
+				fontSize: 16,
+				padding: 10,
+				borderRadius: 10,
+				fontColor: '#fff'
 			}
 		}
-		//các tham số sẽ được truyền từ config của người dùng qua tham số thứ 2 của hàm CreateUI
+		this.defaultConfig = defaultConfig
+		//get the config, if not any config defined use default config
 		this.config =
 			config === undefined
-				? defaultconfig
-				: this.merge(defaultconfig, config)
-
+				? defaultConfig
+				: this.merge(defaultConfig, config)
+		//lặp qua các thuôc tính của config
 		Object.entries(this.config).forEach(([name, value]) => {
+			// ignore properties not use to define Graph
 			if (!this.isCanvasUIObjectDefinition(value, name)) return
-
-			const pos =
-				value.position !== undefined ? value.position : { x: 0, y: 0 }
-
-			if (pos.left !== undefined && pos.x === undefined) pos.x = pos.left
-			if (pos.top !== undefined && pos.y === undefined) pos.y = pos.top
-
+			// define dimensions of the element, make sure it ready to use
 			const width =
 				value.width !== undefined ? value.width : this.config.width
 			const height =
 				value.height !== undefined ? value.height : this.config.height
 
+			// define position of element, make sure it ready to use
+			const pos =
+				value.position !== undefined ? value.position : { x: 0, y: 0 }
+			// calculate position
+			if (pos.left !== undefined && pos.x === undefined) pos.x = pos.left
+			if (pos.top !== undefined && pos.y === undefined) pos.y = pos.top
 			if (pos.right !== undefined && pos.x === undefined)
 				pos.x = this.config.width - pos.right - width
 			if (pos.bottom !== undefined && pos.y === undefined)
 				pos.y = this.config.height - pos.bottom - height
-
+			//if no position can use, put the element at 0,0
 			if (pos.x === undefined) pos.x = 0
 			if (pos.y === undefined) pos.y = 0
 
 			value.position = pos
-
+			// define type of element, make sure it ready to use
 			if (value.type === undefined) value.type = 'text'
 		})
-
+		// make a empty can vas but not display yet
 		const canvas = this.createOffscreenCanvas(
 			this.config.width,
 			this.config.height
@@ -92,36 +110,41 @@ class CanvasUI {
 		this.context = canvas.getContext('2d')
 		this.context.save()
 
+		//define panel opacity
 		const opacity =
-			this.config.opacity !== undefined ? this.config.opacity : 0.7
+			this.config.opacity !== undefined
+				? this.config.opacity
+				: defaultConfig.opacity
 
 		const planeMaterial = new MeshBasicMaterial({
 			transparent: true,
 			opacity
 		})
+
+		//define panel size (1 unit = 1 meter)
 		this.panelSize =
 			this.config.panelSize !== undefined
 				? this.config.panelSize
 				: { width: 1, height: 1 }
+
+		// define panel
 		const planeGeometry = new PlaneGeometry(
 			this.panelSize.width,
 			this.panelSize.height
 		)
-
 		this.mesh = new Mesh(planeGeometry, planeMaterial)
-		//ctr: add user data
-		this.mesh.userData.type = this.config.watcher.split('')[0]
-		this.mesh.userData.name = this.config.watcher
-
-		this.mesh.scale.set(this.config.width, this.config.height, 1)
 		this.texture = new CanvasTexture(canvas)
 		this.mesh.material.map = this.texture
 
+		//define scene
 		this.scene = this.config.scene
 
+		//check if element have type = input text field
 		const inputs = Object.values(this.config).filter((value) => {
 			return value.type === 'input-text'
 		})
+
+		//if have input take field create the key board
 		if (inputs.length > 0) {
 			this.keyboard = new CanvasKeyboard(
 				this.panelSize.width,
@@ -132,11 +155,14 @@ class CanvasUI {
 			this.mesh.add(this.keyboard.mesh)
 		}
 
+		//check the content
 		if (content === undefined) {
+			//if no content set it to the default value
 			this.content = { body: '' }
 			this.config.body.type = 'text'
 		} else {
 			this.content = content
+			//find all button element, in other way, this is can interact elements
 			const btns = Object.values(this.config).filter((value) => {
 				return (
 					value.overflow === 'scroll' ||
@@ -146,21 +172,28 @@ class CanvasUI {
 					value.type === 'slider'
 				)
 			})
+			//behaver when found button element
 			if (btns.length > 0) {
+				//if no renderer make warning
 				if (config === undefined || config.renderer === undefined) {
 					console.warn(
 						'CanvasUI: button, scroll or input-text in the config but no renderer'
 					)
 				} else {
+					//if had a renderer defined, run the controller
 					this.renderer = config.renderer
 					this.initControllers()
 				}
 			}
 		}
-
+		this.pointerSelected = false
+		// biến lưu các controller(tay cầm) khi được khởi tạo
 		this.selectedElements = [undefined, undefined]
+		// biến lưu trạng thái chọn của các controller
 		this.selectPressed = [false, false]
+		// biến lưu trạng thái cuộn của các controller
 		this.scrollData = [undefined, undefined]
+		// biến lưu trạng thái giao điểm của các controller
 		this.intersects = [undefined, undefined]
 
 		this.needsUpdate = true
@@ -171,8 +204,8 @@ class CanvasUI {
 	isCanvasUIObjectDefinition(value, name) {
 		if (typeof value !== 'object') return
 		if (name === 'panelSize') return
-		if (value instanceof WebGLRenderer) return
-		if (value instanceof Scene) return
+		if (name === 'renderer') return
+		if (name === 'scene') return
 		return true
 	}
 
@@ -180,8 +213,8 @@ class CanvasUI {
 		if (typeof elm !== 'object') return
 		if (name === 'panelSize') return
 		if (name === 'body') return
-		if (elm instanceof WebGLRenderer) return
-		if (elm instanceof Scene) return
+		if (name === 'renderer') return
+		if (name === 'scene') return
 		return true
 	}
 
@@ -244,53 +277,60 @@ class CanvasUI {
 		this.raycaster = new Raycaster()
 
 		const self = this
-
+		// hàm xử lý khi selection chọn (trạng thái giống onclick)
 		function onSelect(event) {
 			const index = event.target === self.controller ? 0 : 1
 			const elm = self.selectedElements[index]
 			if (elm !== undefined) {
-				if (elm.type == 'button') {
-					self.select(index)
-				} else if (elm.type == 'picker') {
-					elm.picker.onSelect(self.getIntersect(index))
-					if (elm.picker.needsUpdate) {
-						self.needsUpdate = true
-						elm.picker.needsUpdate = false
-					}
-				} else if (elm.type == 'input-text') {
-					if (self.keyboard) {
-						if (self.keyboard.visible) {
-							self.keyboard.linkedUI = undefined
-							self.keyboard.linkedText = undefined
-							self.keyboard.linkedElement = undefined
-							self.keyboard.visible = false
-						} else {
-							self.keyboard.linkedUI = self
-							let name
-							Object.entries(self.config).forEach(([prop, value]) => {
-								if (value == elm) name = prop
-							})
-							const y =
-								(0.5 -
-									(elm.position.y +
-										elm.height +
-										self.config.body.padding) /
-										self.config.height) *
-								self.panelSize.height
-							const h =
-								Math.max(self.panelSize.width, self.panelSize.height) /
-								2
-							self.keyboard.position.set(0, -h / 1.5 - y, 0.1)
-							self.keyboard.linkedText = self.content[name]
-							self.keyboard.linkedName = name
-							self.keyboard.linkedElement = elm
-							self.keyboard.visible = true
+				switch (elm.type) {
+					case 'button':
+						self.select(index)
+						break
+					case 'picker':
+						elm.picker.onSelect(self.getIntersect(index))
+						if (elm.picker.needsUpdate) {
+							self.needsUpdate = true
+							elm.picker.needsUpdate = false
 						}
-					}
+						break
+					case 'input-text':
+						if (self.keyboard) {
+							if (self.keyboard.visible) {
+								self.keyboard.linkedUI = undefined
+								self.keyboard.linkedText = undefined
+								self.keyboard.linkedElement = undefined
+								self.keyboard.visible = false
+							} else {
+								self.keyboard.linkedUI = self
+								let name
+								Object.entries(self.config).forEach(([prop, value]) => {
+									if (value == elm) name = prop
+								})
+								const y =
+									(0.5 -
+										(elm.position.y +
+											elm.height +
+											self.config.body.padding) /
+											self.config.height) *
+									self.panelSize.height
+								const h =
+									Math.max(
+										self.panelSize.width,
+										self.panelSize.height
+									) / 2
+								self.keyboard.position.set(0, -h / 1.5 - y, 0.1)
+								self.keyboard.linkedText = self.content[name]
+								self.keyboard.linkedName = name
+								self.keyboard.linkedElement = elm
+								self.keyboard.visible = true
+							}
+						}
+						break
+					default:
 				}
 			}
 		}
-
+		/**khi selection bắt đầu chọn(mousedown)*/
 		function onSelectStart(event) {
 			const index = event.target === self.controller ? 0 : 1
 			self.selectPressed[index] = true
@@ -304,7 +344,7 @@ class CanvasUI {
 				}
 			}
 		}
-
+		/**khi selection ngừng chọn (mouseup)*/
 		function onSelectEnd(event) {
 			const index = event.target === self.controller ? 0 : 1
 			self.selectPressed[index] = false
@@ -315,19 +355,22 @@ class CanvasUI {
 				self.scrollData[index] = undefined
 			}
 		}
-
+		function onSqueeze(event) {
+			console.log(event.type)
+		}
 		this.controller = this.renderer.xr.getController(0)
-		this.controller.addEventListener('select', onSelect)
-		this.controller.addEventListener('selectstart', onSelectStart)
-		this.controller.addEventListener('selectend', onSelectEnd)
+		this.controller.addEventListener('select', (e) => onSelect(e))
+		this.controller.addEventListener('selectstart', (e) => onSelectStart(e))
+		this.controller.addEventListener('squeeze', (e) => onSqueeze(e))
+		this.controller.addEventListener('selectend', (e) => onSelectEnd(e))
 		this.controller1 = this.renderer.xr.getController(1)
-		this.controller1.addEventListener('select', onSelect)
-		this.controller1.addEventListener('selectstart', onSelectStart)
-		this.controller1.addEventListener('selectend', onSelectEnd)
-
+		this.controller1.addEventListener('select', (e) => onSelect(e))
+		this.controller1.addEventListener('selectstart', (e) => onSelectStart(e))
+		this.controller1.addEventListener('selectend', (e) => onSelectEnd(e))
+		// chưa rõ mục đích tạo hai lưới này
 		if (this.scene) {
 			const radius = 0.015
-			const geometry = new IcosahedronBufferGeometry(radius)
+			const geometry = new IcosahedronGeometry(radius)
 			const material = new MeshBasicMaterial({ color: 0x0000aa })
 
 			const mesh1 = new Mesh(geometry, material)
@@ -405,17 +448,17 @@ class CanvasUI {
 			}
 		}
 	}
-
+	/**set position for panel - public method*/
 	setPosition(x, y, z) {
 		if (this.mesh === undefined) return
 		this.mesh.position.set(x, y, z)
 	}
-
+	/**set rotation for panel - public method */
 	setRotation(x, y, z) {
 		if (this.mesh === undefined) return
 		this.mesh.rotation.set(x, y, z)
 	}
-
+	/**update content of a element in this panel */
 	updateElement(name, content) {
 		let elm = this.content[name]
 
@@ -434,7 +477,7 @@ class CanvasUI {
 
 		this.needsUpdate = true
 	}
-
+	/**return this graphic mesh od this panel */
 	get panel() {
 		return this.mesh
 	}
@@ -461,6 +504,7 @@ class CanvasUI {
 		return elm
 	}
 
+	/**update config of a element in this panel */
 	updateConfig(name, property, value) {
 		let elm = this.config[name]
 
@@ -474,6 +518,7 @@ class CanvasUI {
 		this.needsUpdate = true
 	}
 
+	/**behaver when a button hovered */
 	hover(index = 0, uv) {
 		if (uv === undefined) {
 			if (this.selectedElements[index] !== undefined) {
@@ -483,7 +528,7 @@ class CanvasUI {
 		} else {
 			const x = uv.x * (this.config.width || 512)
 			const y = (1 - uv.y) * (this.config.height || 512)
-			//console.log( `hover uv:${uv.x.toFixed(2)},${uv.y.toFixed(2)}>>texturePos:${x.toFixed(0)}, ${y.toFixed(0)}`);
+			// console.log( `hover uv:${uv.x.toFixed(2)},${uv.y.toFixed(2)}>>texturePos:${x.toFixed(0)}, ${y.toFixed(0)}`);
 			const elm = this.getElementAtLocation(x, y)
 			if (elm === null) {
 				if (this.selectedElements[index] !== undefined) {
@@ -497,13 +542,11 @@ class CanvasUI {
 		}
 	}
 
+	/**behaver when a button or input-text selected*/
 	select(index = 0) {
 		if (this.selectedElements[index] !== undefined) {
 			const elm = this.selectedElements[index]
-			if (elm.onSelect) {
-				elm.onSelect(this.config.watcher)
-				console.log('selected', elm, ';;', this.config.watcher)
-			}
+			if (elm.onSelect) elm.onSelect.action(elm.onSelect.params)
 			if (elm.type === 'input-text') {
 				this.keyboard.mesh.visible = true
 			} else {
@@ -550,10 +593,7 @@ class CanvasUI {
 		const intersects = this.raycaster.intersectObject(this.mesh)
 		const elm = this.selectedElements[index]
 
-		////////////////////////trungctr //////
-
 		if (intersects.length > 0) {
-			// console.log('controller clicked')
 			if (elm && elm.type === 'slider') {
 				if (this.selectPressed[index]) {
 					this.intersects[index] = intersects[0]
@@ -571,7 +611,7 @@ class CanvasUI {
 			this.scroll(index)
 		}
 	}
-
+	/**update this panel and all elements*/
 	update() {
 		if (this.mesh === undefined) return
 
@@ -586,12 +626,12 @@ class CanvasUI {
 
 		context.clearRect(0, 0, this.config.width, this.config.height)
 
-		const bgColor = this.config.body.backgroundColor
-			? this.config.body.backgroundColor
-			: '#000'
+		const bgColor = this.config.backgroundColor
+			||this.config.body.backgroundColor
+			||'#FFFFFF00'
 		const fontFamily = this.config.body.fontFamily
 			? this.config.body.fontFamily
-			: 'Arial Narrow'
+			: 'Arial'
 		const fontColor = this.config.body.fontColor
 			? this.config.body.fontColor
 			: '#fff'
@@ -897,7 +937,7 @@ class CanvasUI {
 					? config.fontColor
 					: this.config.body.fontColor
 			context.fillStyle = '#aaa'
-			this.fillRoundedRect(pos.x + width - 12, pos.y, 12, height, 6)
+			this.fillRoundedRect(pos.x + width - 12, pos.y, 12, height,config.borderRadius|| this.defaultConfig.body.borderRadius)
 			context.fillStyle = '#666'
 			const scale = rect.height / textHeight
 			const thumbHeight = scale * height
@@ -907,7 +947,7 @@ class CanvasUI {
 				pos.y + thumbY,
 				12,
 				thumbHeight,
-				6
+				config.borderRadius || this.defaultConfig.body.borderRadius
 			)
 			context.fillStyle = fontColor
 			scrollY = config.scrollY
@@ -937,4 +977,6 @@ class CanvasUI {
 }
 
 export { CanvasUI }
+
+
 

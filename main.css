@@ -1,4 +1,5 @@
-﻿html, body {
+﻿html,
+body {
 	padding: 0;
 	margin: 0;
 	height: 100%;
@@ -57,14 +58,25 @@
 
 .console {
 	position: fixed;
-	bottom: 30px;
+	bottom: 20px;
 	padding-bottom: 25px;
 	width: 30%;
 	height: 30vh;
 	z-index: 999;
 }
 
+.console span {
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+}
+
+.console span:hover {
+	background-color: black;
+}
+
 .console-title {
+	position: relative;
 	background-color: white;
 	color: black;
 	font-size: 1.5rem;

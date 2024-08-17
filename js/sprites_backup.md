@@ -105,3 +105,93 @@ Converted values:
 2% — 05
 1% — 03
 0% — 00
+
+
+//HUD with secondary ortho camera and scene
+	if (!this.isOculus) {
+			this.renderer.autoClear = false
+		}
+
+		this.sceneHUD = new THREE.Scene()
+		const width = window.innerWidth
+		const height = window.innerHeight
+		this.cameraOrtho = new THREE.OrthographicCamera(
+			width / -2,
+			width / 2,
+			height / 2,
+			height / -2,
+			0,
+			1000
+		)
+		this.cameraOrtho.position.z = 100
+		this.sceneHUD.add(this.cameraOrtho)
+		this.cameraOrtho.updateProjectionMatrix()
+
+		let spriteTL, spriteTR, spriteBL, spriteBR, spriteC
+		function createHUDSprites(t) {
+			t.colorSpace = THREE.SRGBColorSpace
+
+			const material = new THREE.SpriteMaterial({ map: t })
+			const width = material.map.image.width
+			const height = material.map.image.height
+
+			spriteTL = new THREE.Sprite(material)
+			spriteTL.center.set(0.0, 1.0)
+			spriteTL.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteTL)
+
+			spriteTR = new THREE.Sprite(material)
+			spriteTR.center.set(1.0, 1.0)
+			spriteTR.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteTR)
+
+			spriteBL = new THREE.Sprite(material)
+			spriteBL.center.set(0.0, 0.0)
+			spriteBL.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteBL)
+
+			spriteBR = new THREE.Sprite(material)
+			spriteBR.center.set(1.0, 0.0)
+			spriteBR.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteBR)
+
+			spriteC = new THREE.Sprite(material)
+			spriteC.center.set(0.5, 0.5)
+			spriteC.scale.set(width, height, 1)
+			_THIS.sceneHUD.add(spriteC)
+
+			updateHUDSprites()
+		}
+
+		function updateHUDSprites() {
+			const width = window.innerWidth / 2
+			const height = window.innerHeight / 2
+
+			spriteTL.position.set(-width, height, 1) // top left
+			spriteTR.position.set(width, height, 1) // top right
+			spriteBL.position.set(-width, -height, 1) // bottom left
+			spriteBR.position.set(width, -height, 1) // bottom right
+			spriteC.position.set(0, 0, 1) // center
+		}
+
+		const textureLoader = new THREE.TextureLoader()
+		textureLoader.load('./asset/textures/sprite0.png', (t) =>
+			createHUDSprites(t)
+		)
+
+			render() {
+		if (this.isOculus) {
+			this.renderer.render(this.scene, this.camera)
+		} else {
+			this.renderer.clear()
+			this.renderer.render(this.scene, this.camera)
+			// this.renderer.clearDepth()
+			// this.renderer.render(this.sceneHUD, this.cameraOrtho)
+		}
+	}
+		//on resize
+		this.cameraOrtho.left = -window.innerWidth / 2
+		this.cameraOrtho.right = window.innerWidth / 2
+		this.cameraOrtho.top = window.innerHeight / 2
+		this.cameraOrtho.bottom = -window.innerHeight / 2
+		this.cameraOrtho.updateProjectionMatrix()

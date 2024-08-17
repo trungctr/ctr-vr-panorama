@@ -2,12 +2,12 @@
 import { Areas, Devices } from './data.js'
 import { CanvasUI } from './canvas_gui/CanvasUI.js'
 import SpriteUI from './sprite_canvas_gui/spriteUI.js'
-import GLOBAL_ENV from './global.js'
 
 class Action {
 	constructor(app) {
 		//tham chieu app duoc truyen tu class ActionMapping trong file actionMap.js
 		this.app = app
+		this.log = app.log
 	}
 	previousArea() {
 		const _THIS = this
@@ -21,6 +21,7 @@ class Action {
 	}
 	nextArea() {
 		const _THIS = this
+		console.log(_THIS.app.state)
 		let nextAreaNo = _THIS.app.state.areaNo + 1
 		if (_THIS.app.state.areaNo == 17) {
 			nextAreaNo = 0
@@ -43,7 +44,7 @@ class Action {
 			_THIS.app.scene.background.mapping =
 				THREE.EquirectangularReflectionMapping
 			_THIS.putLabels(area)
-			_THIS.app.GLOBAL_ENV.devLog.info(
+			_THIS.log.info(
 				`${JSON.stringify(_THIS.app.state.areaNo)}.[${area}] ${
 					Areas[area].name
 				}`
@@ -53,16 +54,15 @@ class Action {
 	clearLabels() {
 		const _THIS = this
 		const labels = _THIS.app.state.labels
-		if (labels.length > 0) {
-			labels.forEach((l) => {
-				let group = _THIS.app.scene.getObjectByName('trackGroup')
-				let label = group.getObjectByName(l)
-				// let label = group.getObjectsByProperty('userMark',l)
-				label.removeFromParent()
-				// _THIS.app.GLOBAL_ENV.devLog.info('removed: ' + l)
-			})
-			_THIS.app.state.labels = []
-		}
+		Object.entries(labels).forEach((l) => {
+			console.log('clear label', l)
+			let group = _THIS.app.scene.getObjectByName('trackGroup')
+			let label = group.getObjectByName(l.mesh.userMark)
+			// let label = group.getObjectsByProperty('userMark',l)
+			label ? label.removeFromParent() : ''
+			// this.log.info('removed: ' + l)
+		})
+		_THIS.app.state.labels = []
 	}
 	putLabels(area) {
 		const _THIS = this
@@ -70,51 +70,50 @@ class Action {
 		let labels = Areas[area].labels
 		if (labels.length == 0) return 0
 		labels.forEach((device) => {
-			let content = Devices[device.id].name,
+			const name = String(device.id)
+			let content = { label: Devices[device.id].name },
 				config = {
-					panelSize: { width: 200, height: 100, actualSize: 2 },
-					backgroundColor: '#0000ff',
-					backgroundTransparent: 'cc',
-					borderRadius: 6,
-					opacity: 0.7,
-					padding: 10,
-					/*font here*/
-					fontFamily: 'Arial',
-					fontSize: 16,
-					color: '#ffffff',
-
-					/*user data*/
-					userData: {
-						userType: 'label',
-						userMark: device.id,
-						userEvent: 'showInformation'
+					panelSize: { width: 0.2, height: 0.1 },
+					height: 170,
+					opacity: 1,
+					renderer: _THIS.app.renderer,
+					scene: _THIS.app.scene,
+					label: {
+						type: 'button',
+						position: { top: 98, left: 0 },
+						width: 512,
+						fontColor: '#fff',
+						hover: '#bb0',
+						backgroundColor: '#0000ffcc'
 					}
 				}
 
-			const label = new SpriteUI(content, config)
-			label.position.set(device.pos.x, device.pos.y, device.pos.z)
-			_THIS.app.trackGroup.add(label)
-			_THIS.app.state.labels.push(device.id)
+			const label = new CanvasUI(content, config)
+			label.panel.userMark = device.id
+			label.panel.userEvent = 'showInformation'
+			label.panel.position.set(device.pos.x, device.pos.y, device.pos.z)
+			_THIS.app.trackGroup.add(label.panel)
+			_THIS.app.state.labels[name] = label
 		})
 	}
 	moveForward() {
-		GLOBAL_ENV.devLog.info('move forward')
-		this.app.camera.translateY(0.5)
+		this.log.info('move forward')
+		this.app.camera.translateZ(-0.5)
 		this.updateCam()
 	}
 	moveBackward() {
-		GLOBAL_ENV.devLog.info('move backward')
-		this.app.camera.translateY(-0.5)
-		this.updateCam()
-	}
-	moveUp() {
-		GLOBAL_ENV.devLog.info('move up')
+		this.log.info('move backward')
 		this.app.camera.translateZ(0.5)
 		this.updateCam()
 	}
+	moveUp() {
+		this.log.info('move up')
+		this.app.camera.translateY(0.5)
+		this.updateCam()
+	}
 	moveDown() {
-		GLOBAL_ENV.devLog.info('move down')
-		this.app.camera.translateZ(-0.5)
+		this.log.info('move down')
+		this.app.camera.translateY(-0.5)
 		this.updateCam()
 	}
 	updateCam() {
@@ -126,7 +125,6 @@ class Action {
 		)
 		// this.app.cameraControls.update()
 	}
-
 	reRenderLabel(label) {}
 	objectOnHover() {}
 	showInformation(label) {

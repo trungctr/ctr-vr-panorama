@@ -5,25 +5,29 @@ import { Areas, Devices } from './data.js'
 import GLOBAL_ENV from './global.js'
 import Action from './actions.js'
 import Control from './control/index.js'
+import { CanvasUI } from './canvas_gui/CanvasUI.js'
+
+function millimeter(n) {
+	return Number(n / 1000)
+}
 class Application {
 	constructor() {
-		this.actions = new Action(this)
-		this.controls = new Control(this)
+		const _THIS = this
 		/**
 		 * khởi tạo state
 		 */
-		const _THIS = this
-		this.log = GLOBAL_ENV.devLog
-		this.isOculus = GLOBAL_ENV.isOculus
-		this.isDeveloping = GLOBAL_ENV.developing
-		this.startButton = GLOBAL_ENV.startButton
 
 		this.state = {
 			areasArray: Object.keys(Areas),
 			areaNo: 0,
 			selectedObject: null,
-			labels: []
+			labels: {},
+			GUIs: {}
 		}
+		this.log = GLOBAL_ENV.devLog
+		this.isOculus = GLOBAL_ENV.isOculus
+		this.isDeveloping = GLOBAL_ENV.developing
+		this.startButton = GLOBAL_ENV.startButton
 		/*
 		 * tạo vùng chứa ứng dụng trên DOM
 		 */
@@ -31,7 +35,7 @@ class Application {
 		document.body.appendChild(container)
 
 		/*
-		 * tạo background cho ứng dụng
+		 * load background cho ứng dụng
 		 */
 		this.scene = new THREE.Scene()
 		// this.scene.background = new THREE.Color(0x000000)
@@ -91,21 +95,48 @@ class Application {
 		// track group
 		this.trackGroup = new THREE.Group()
 		this.trackGroup.name = 'trackGroup'
+		this.scene.add(this.trackGroup)
 
-		//HUD group
-		this.hudGroup = new THREE.Group()
-		this.hudGroup.name = 'HUD'
+		/*
+		 * thêm các đối tượng thuộc HUD
+		 */
+		//HUD - next button
+		const geometry = new THREE.PlaneGeometry(
+			millimeter(15),
+			millimeter(15),
+			10,
+			10
+		)
+		const material = new THREE.MeshBasicMaterial({
+			color: 0xffff00,
+			side: THREE.DoubleSide,
+			wireframe: !true
+		})
+		this.plane = new THREE.Mesh(geometry, material)
+		this.plane.userMark = 'p1'
+		this.plane.userEvent = 'showInformation'
+		this.camera.add(this.plane)
+		this.plane.position.set(
+			millimeter(window.innerWidth / 20 + 35),
+			millimeter(-(window.innerHeight / 20 + 30)),
+			-millimeter(150)
+		)
 
-		// origin box
-		if (this.isDeveloping) {
-			const boxGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1)
-			const boxMaterial = new THREE.MeshStandardMaterial({
-				color: 0x00ff00
-			})
-			const box = new THREE.Mesh(boxGeometry, boxMaterial)
-			box.position.set(1, 0, 1)
-			this.trackGroup.add(box)
-		}
+		//HUD - next button
+		const material2 = new THREE.MeshBasicMaterial({
+			color: 0x00ff00,
+			side: THREE.DoubleSide,
+			wireframe: !true
+		})
+		this.plane2 = new THREE.Mesh(geometry, material2)
+		this.plane2.userMark = 'p2'
+		this.plane2.userEvent = 'showInformation'
+		this.camera.add(this.plane2)
+		this.plane2.position.set(
+			millimeter(-(window.innerWidth / 20 + 35)),
+			millimeter(-(window.innerHeight / 20 + 30)),
+			-millimeter(150)
+		)
 
 		//#ref  reference sphere
 		const sphereGeometry = new THREE.SphereGeometry(100, 100, 100)
@@ -119,11 +150,6 @@ class Application {
 		this.refSphere.name = 'snap'
 		this.refSphere.castShadow = true
 		this.trackGroup.add(this.refSphere)
-
-		// add sprite labels
-		this.actions.putLabels(this.state.areasArray[this.state.areaNo])
-
-		this.scene.add(this.trackGroup)
 		/*
 		 * tạo trình kết xuất bằng webGL
 		 * antialias: true = bật khử răng cưa
@@ -133,9 +159,7 @@ class Application {
 		this.renderer.setPixelRatio(window.devicePixelRatio)
 		// thiết lập kích thước cửa sổ ứng dụng; đang thiết lập full màn hình
 		this.renderer.setSize(window.innerWidth, window.innerHeight)
-		if (!this.isOculus) {
-			this.renderer.autoClear = false
-		}
+
 		// thêm của sổ ứng dụng vào vùng chứa được tạo trước đó
 		container.appendChild(this.renderer.domElement)
 		/*
@@ -143,120 +167,54 @@ class Application {
 		 * để những thay đổi về vị trí camera và đối tượng trong cảnh được cập nhật liên tục
 		 * chúng ta có thể thiết lập vòng lặp hoạt ảnh để thực hiện việc đó.
 		 */
-		//HUD
-		this.sceneHUD = new THREE.Scene()
-		const width = window.innerWidth
-		const height = window.innerHeight
-		this.cameraOrtho = new THREE.OrthographicCamera(
-			width / -2,
-			width / 2,
-			height / 2,
-			height / -2,
-			0,
-			1000
-		)
-		this.cameraOrtho.position.z = 100
-		this.sceneHUD.add(this.cameraOrtho)
-		this.cameraOrtho.updateProjectionMatrix()
 
-		//HUD
-		let spriteTL, spriteTR, spriteBL, spriteBR, spriteC
-		function createHUDSprites(t) {
-			t.colorSpace = THREE.SRGBColorSpace
-
-			const material = new THREE.SpriteMaterial({ map: t })
-			const width = material.map.image.width
-			const height = material.map.image.height
-
-			spriteTL = new THREE.Sprite(material)
-			spriteTL.center.set(0.0, 1.0)
-			spriteTL.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteTL)
-
-			spriteTR = new THREE.Sprite(material)
-			spriteTR.center.set(1.0, 1.0)
-			spriteTR.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteTR)
-
-			spriteBL = new THREE.Sprite(material)
-			spriteBL.center.set(0.0, 0.0)
-			spriteBL.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteBL)
-
-			spriteBR = new THREE.Sprite(material)
-			spriteBR.center.set(1.0, 0.0)
-			spriteBR.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteBR)
-
-			spriteC = new THREE.Sprite(material)
-			spriteC.center.set(0.5, 0.5)
-			spriteC.scale.set(width, height, 1)
-			_THIS.sceneHUD.add(spriteC)
-
-			updateHUDSprites()
-		}
-
-		function updateHUDSprites() {
-			const width = window.innerWidth / 2
-			const height = window.innerHeight / 2
-
-			spriteTL.position.set(-width, height, 1) // top left
-			spriteTR.position.set(width, height, 1) // top right
-			spriteBL.position.set(-width, -height, 1) // bottom left
-			spriteBR.position.set(width, -height, 1) // bottom right
-			spriteC.position.set(0, 0, 1) // center
-		}
-
-		const textureLoader = new THREE.TextureLoader()
-		textureLoader.load('./asset/textures/sprite0.png', (t) =>
-			createHUDSprites(t)
-		)
 		//================================================================
 		this.renderer.setAnimationLoop(this.render.bind(_THIS))
+		//Theo dõi sự thay đổi kích thước cửa sổ và cập nhật kích thước vùng chứa
+		window.addEventListener('resize', this.resize.bind(_THIS))
+		//hàm điều khiển camera
+		this.cameraControls = new OrbitControls(
+			this.camera,
+			this.renderer.domElement
+		)
+		this.actions = new Action(_THIS)
+		this.controls = new Control(_THIS)
+		this.actions.putLabels(this.state.areasArray[this.state.areaNo])
 	}
 
 	resize() {
-		const width = window.innerWidth
-		const height = window.innerHeight
-		this.camera.aspect = window.innerWidth / window.innerHeight
+		let width = window.innerWidth,
+			height = window.innerHeight
+		this.camera.aspect = width / height
 		this.camera.updateProjectionMatrix()
-		this.renderer.setSize(window.innerWidth, window.innerHeight)
+		this.renderer.setSize(width, height)
 
-		this.cameraOrtho.left = -width / 2
-		this.cameraOrtho.right = width / 2
-		this.cameraOrtho.top = height / 2
-		this.cameraOrtho.bottom = -height / 2
-		this.cameraOrtho.updateProjectionMatrix()
+		// update HUD position
+		this.plane.position.set(
+			millimeter(width / 20),
+			millimeter(-(height / 20 + 25)),
+			-millimeter(150)
+		)
 	}
 
 	action() {
+		const _THIS = this
+		//track controller
+		this.controls.vrPointer()
 		this.trackGroup.position.copy(this.camera.position)
-		if (!this.isOculus) {
-			this.cameraControls.target.set(
-				this.trackGroup.position.x + 0.001,
-				this.trackGroup.position.y,
-				this.trackGroup.position.z + 0.001
-			)
-			this.camera.lookAt(
-				this.cameraControls.target.x,
-				this.cameraControls.target.y,
-				this.cameraControls.target.z
-			)
+		if (this.vrMenu) {
+			this.vrMenu.update()
 		}
+		// this.plane.lookAt(this.camera.position)
 	}
 
 	render() {
-		if (this.isOculus) {
-			this.renderer.render(this.scene, this.camera)
-		} else {
-			this.renderer.clear()
-			this.renderer.render(this.scene, this.camera)
-			this.renderer.clearDepth()
-			this.renderer.render(this.sceneHUD, this.cameraOrtho)
-		}
+		this.action()
+		this.renderer.render(this.scene, this.camera)
 	}
 
 	VRrender() {
+		const _THIS = this
 		/**
 		 * setup VR/XR
 		 */
@@ -292,30 +250,105 @@ class Application {
 
 		const line = new THREE.Line(lineGeometry)
 		line.name = 'selectorLine'
-		line.scale.z = 100
+		line.scale.z = 10000
 
 		this.controller.add(line.clone())
 		this.controller1.add(line.clone())
 
-		this.trackGroup.position.copy(this.camera.position)
-		//-------------------------------------------------------
-		this.action()
+		// add a menu in vr
+		function gotoPrev() {
+			_THIS.actions.previousArea()
+		}
+		function gotoNext() {
+			_THIS.actions.nextArea()
+		}
+		const vrMenuConfig = {
+			panelSize: { width: 0.512, height: 0.17 },
+			height: 170,
+			opacity: 1,
+			backgroundColor: '#000',
+			renderer: this.renderer,
+			scene: this.scene,
+			info: {
+				type: 'text',
+				position: { left: 0, top: 0 },
+				width: 512,
+				height: 85,
+				backgroundColor: '#000',
+				fontColor: '#fff',
+				fontSize: 25
+			},
+			line: {
+				type: 'shape',
+				position: { left: 0, top: 85 },
+				width: 512,
+				height: 2,
+				backgroundColor: '#fff'
+			},
+			prev: {
+				type: 'button',
+				position: { top: 98, left: 0 },
+				width: 70,
+				fontColor: '#fff',
+				hover: '#bb0',
+				onSelect: {
+					action: gotoPrev,
+					params: ''
+				}
+			},
+			next: {
+				type: 'button',
+				position: { top: 98, left: 75 },
+				width: 70,
+				fontColor: '#fff',
+				hover: '#bb0',
+				// hover: '#2659a4',
+				onSelect: {
+					action: gotoNext,
+					params: ''
+				}
+			},
+			mute: {
+				type: 'button',
+				position: { top: 90, left: 150 },
+				width: 70,
+				fontColor: '#fff',
+				hover: '#bb0'
+				// onSelect: ''
+			},
+			sound: {
+				type: 'slider',
+				position: { top: 115, right: 20 },
+				width: 200,
+				height: 30,
+				fontColor: '#fff',
+				hover: '#bb0'
+				// onSelect: ''
+			}
+		}
+		const vrMenuContent = {
+			info: Areas[this.state.areasArray[this.state.areaNo]].name,
+			line: '',
+			prev: '<path>M 10 32 L 54 10 L 54 54 Z</path>',
+			mute: '<path>M55.326 55.236A38.88 38.88 90 0066.75 27.66 38.88 38.88 90 0055.326.084L51.084 4.326A32.88 32.88 90 0160.75 27.66 32.88 32.88 90 0151.09 51ZM46.842 46.752A27 27 90 0054.75 27.66 27 27 90 0046.842 8.568L42.6 12.81A21 21 90 0148.75 27.66 21 21 90 0142.6 42.51ZM34.902.96A3 3 90 0136.6 3.66V51.66A3 3 90 0131.728 54L17.55 42.66H3.6A3 3 90 01.6 39.66V15.66A3 3 90 013.6 12.66H17.55L31.728 1.32A3 3 90 0134.902.96</path>',
+			// mute: '<path>M 33.585 17.75 A 2.5 2.5 90 0 1 35 20 V 60 A 2.5 2.5 90 0 1 30.94 61.95 L 19.125 52.5 H 7.5 A 2.5 2.5 90 0 1 5 50 V 30 A 2.5 2.5 90 0 1 7.5 27.5 H 19.125 L 30.94 18.05 A 2.5 2.5 90 0 1 33.585 17.75 M 30 25.2 L 21.56 31.95 A 2.5 2.5 90 0 1 20 32.5 H 10 V 47.5 H 20 A 2.5 2.5 90 0 1 21.56 48.05 L 30 54.8 Z M 69.27 28.23 A 2.5 2.5 90 0 1 69.27 31.77 L 61.035 40 L 69.27 48.23 A 2.5 2.5 90 0 1 65.73 51.77 L 57.5 43.535 L 49.27 51.77 A 2.5 2.5 90 0 1 45.73 48.23 L 53.965 40 L 45.73 31.77 A 2.5 2.5 90 0 1 49.27 28.23 L 57.5 36.465 L 65.73 28.23 A 2.5 2.5 90 0 1 69.27 28.23</path>',
+			sound: 80,
+			next: '<path>M 54 32 L 10 10 L 10 54 Z</path>'
+		}
+
+		this.vrMenu = new CanvasUI(vrMenuContent, vrMenuConfig)
+		this.vrMenu.panel.userMark= 'GUImenu'
+		this.vrMenu.panel.position.set(0, 0.2, -0.1)
+		this.controller1.attach(this.vrMenu.mesh)
+
+		//thêm trình điều khiển
+		this.controls.gamePad()
 		//-------------------------------------------------------
 		this.render()
 	}
 
 	WebGLrender() {
 		const _THIS = this
-		//Theo dõi sự thay đổi kích thước cửa sổ và cập nhật kích thước vùng chứa
-		window.addEventListener('resize', this.resize.bind(_THIS))
-		//hàm điều khiển camera
-		this.cameraControls = new OrbitControls(
-			this.camera,
-			this.renderer.domElement
-		)
-
-		//-------------------------------------------------------
-		this.action()
 		//them trinh dieu khien
 		this.controls.pointer()
 		this.controls.Keyboard()

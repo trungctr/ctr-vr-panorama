@@ -1,4 +1,4 @@
-import { Color } from '../../three146/build/three.module.js'
+import { Color } from '../../three162/build/three.module.js'
 
 class CanvasColorPicker {
 	constructor(x, y, w, h, col) {

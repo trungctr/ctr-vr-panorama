@@ -34,6 +34,20 @@ GLOBAL_ENV.startButton.addEventListener('click', () => {
 	document.getElementById('introContainer').classList.add('hide')
 })
 
+let showTerminal = true
+document.getElementById('toggle-console').onclick = () => { 
+	if (showTerminal)
+	{
+		showTerminal = !showTerminal
+		document.getElementById('console').style.height = '10px'
+		document.getElementById('console').style.bottom = '0px'
+	} else
+	{
+		showTerminal = !showTerminal
+		document.getElementById('console').style.height = '30vh'
+		document.getElementById('console').style.bottom = '20px'
+	}
+}
 
 
 if (GLOBAL_ENV.webGLcompatibility)

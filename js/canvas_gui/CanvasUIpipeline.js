@@ -34,107 +34,67 @@ import { CanvasSlider } from './CanvasSlider.js'
  * @method setPosition(x,y,z) set the position of the panel; x,y,z is number
  * @method setRotation(x,y,z) set the rotation of the panel; x,y,z is number
  * @param {object}configuration defined by one or many children Object, each Object is one element
- * @param type text | button | image | shape | slider
- * @param hover  hex
- * @param active  hex
- * @param position  x, y, left, right, top, bottom
- * @param width pixels, will inherit from body if missing
- * @param height pixels, will inherit from body if missing
- * @param overflow fit | scroll | hidden
- * @param textAlign center | left | right
- * @param fontSize pixels
- * @param fontColor hex
- * @param fontFamily string
- * @param padding pixels
- * @param backgroundColor hex
- * @param borderRadius pixels
- * @param clipPath svg path -- note: all command in path must be in upper case
- * @param border width color style
+ * @type text | button | image | shape | slider
+ * @hover  hex
+ * @active  hex
+ * @position  x, y, left, right, top, bottom
+ * @width pixels, will inherit from body if missing
+ * @height pixels, will inherit from body if missing
+ * @overflow fit | scroll | hidden
+ * @textAlign center | left | right
+ * @fontSize pixels
+ * @fontColor hex
+ * @fontFamily string
+ * @padding pixels
+ * @backgroundColor hex
+ * @borderRadius pixels
+ * @clipPath svg path -- note: all command in path must be in upper case
+ * @border width color style
  */
 class CanvasUI {
 	constructor(content, config) {
-		const defaultConfig = {
+		this.scene
+		this.renderer
+		this.elements = {}
+		this.defaultContent = `!#ERROR: You haven't input any thing`
+		this.defaultConfig = {
 			panelSize: { width: 1, height: 1 },
 			width: 512,
 			height: 512,
 			opacity: 1,
 			borderRadius: 0,
+			backgroundColor: '#FFFFFF00',
+			padding: 0,
 			body: {
 				type: 'text',
 				fontFamily: 'Arial',
+				fontColor: '#fff',
 				fontSize: 16,
 				padding: 10,
-				borderRadius: 10,
-				fontColor: '#fff'
+				backgroundColor: '#000',
+				borderRadius: 0
 			}
 		}
-		this.defaultConfig = defaultConfig
 		//get the config, if not any config defined use default config
 		this.config =
 			config === undefined
-				? defaultConfig
-				: this.merge(defaultConfig, config)
-		//lặp qua các thuôc tính của config
-		Object.entries(this.config).forEach(([name, value]) => {
-			// ignore properties not use to define Graph
-			if (!this.isCanvasUIObjectDefinition(value, name)) return
-			// define dimensions of the element, make sure it ready to use
-			const width =
-				value.width !== undefined ? value.width : this.config.width
-			const height =
-				value.height !== undefined ? value.height : this.config.height
+				? this.defaultConfig
+				: this.merge(this.defaultConfig, config)
 
-			// define position of element, make sure it ready to use
-			const pos =
-				value.position !== undefined ? value.position : { x: 0, y: 0 }
-			// calculate position
-			if (pos.left !== undefined && pos.x === undefined) pos.x = pos.left
-			if (pos.top !== undefined && pos.y === undefined) pos.y = pos.top
-			if (pos.right !== undefined && pos.x === undefined)
-				pos.x = this.config.width - pos.right - width
-			if (pos.bottom !== undefined && pos.y === undefined)
-				pos.y = this.config.height - pos.bottom - height
-			//if no position can use, put the element at 0,0
-			if (pos.x === undefined) pos.x = 0
-			if (pos.y === undefined) pos.y = 0
+		this.panelWidth
+		this.panelHeight
+		this.height = this.config.height || this.defaultConfig.height
+		this.width = this.config.width || this.defaultConfig.height
+		this.ratio = window.devicePixelRatio
+		this.dpi = (n) => {
+			return n * (12 / this.ratio)
+		}
 
-			value.position = pos
-			// define type of element, make sure it ready to use
-			if (value.type === undefined) value.type = 'text'
-		})
-		// make a empty can vas but not display yet
-		const canvas = this.createOffscreenCanvas(
-			this.config.width,
-			this.config.height
-		)
-		this.context = canvas.getContext('2d')
-		this.context.save()
-
-		//define panel opacity
-		const opacity =
-			this.config.opacity !== undefined
-				? this.config.opacity
-				: defaultConfig.opacity
-
-		const planeMaterial = new MeshBasicMaterial({
-			transparent: true,
-			opacity
-		})
-
-		//define panel size (1 unit = 1 meter)
-		this.panelSize =
-			this.config.panelSize !== undefined
-				? this.config.panelSize
-				: { width: 1, height: 1 }
-
-		// define panel
-		const planeGeometry = new PlaneGeometry(
-			this.panelSize.width,
-			this.panelSize.height
-		)
-		this.mesh = new Mesh(planeGeometry, planeMaterial)
-		this.texture = new CanvasTexture(canvas)
-		this.mesh.material.map = this.texture
+		this.collectElm()
+		this.canvas
+		this.context
+		this.texture
+		this.mesh
 
 		//define scene
 		this.scene = this.config.scene
@@ -158,8 +118,8 @@ class CanvasUI {
 		//check the content
 		if (content === undefined) {
 			//if no content set it to the default value
-			this.content = { body: '' }
-			this.config.body.type = 'text'
+			this.content = this.defaultContent
+			this.config.body.backgroundColor ='#ff0000'
 		} else {
 			this.content = content
 			//find all button element, in other way, this is can interact elements
@@ -200,8 +160,44 @@ class CanvasUI {
 
 		this.update()
 	}
+	/**chuẩn hoá và thu thập thông tin của element*/
+	collectElm() {
+		const _THIS = this
+		//lặp qua các thuôc tính của config
+		Object.entries(_THIS.config).forEach(([elm, config]) => {
+			// ignore properties not use to define the element
+			if (!_THIS.isElementConfig(config, elm)) return
+			// define dimensions of the element, make sure it ready to use
+			const width =
+				config.width !== undefined ? config.width : _THIS.config.width
+			const height =
+				config.height !== undefined ? config.height : _THIS.config.height
 
-	isCanvasUIObjectDefinition(value, name) {
+			// define position of element, make sure it ready to use
+			const pos =
+				config.position !== undefined ? config.position : { x: 0, y: 0 }
+			// calculate position
+			if (pos.left !== undefined && pos.x === undefined) pos.x = pos.left
+			if (pos.top !== undefined && pos.y === undefined) pos.y = pos.top
+			if (pos.right !== undefined && pos.x === undefined)
+				pos.x = _THIS.config.width - pos.right - width
+			if (pos.bottom !== undefined && pos.y === undefined)
+				pos.y = _THIS.config.height - pos.bottom - height
+			//if no position can use, put the element at 0,0
+			if (pos.x === undefined) pos.x = 0
+			if (pos.y === undefined) pos.y = 0
+
+			config.position = pos
+			// define type of element, make sure it ready to use
+			if (config.type === undefined) config.type = 'text'
+			this.elements[elm] = config
+		})
+	}
+
+	/**
+	 * kiểm tra xem đây có phải là thuộc tính CSS không ?
+	 */
+	isCSSvalue(value, name) {
 		if (typeof value !== 'object') return
 		if (name === 'panelSize') return
 		if (name === 'renderer') return
@@ -209,7 +205,8 @@ class CanvasUI {
 		return true
 	}
 
-	isCanvasUIMesh(elm, name) {
+	/**kiểm tra xem đây có phải là một element không ?*/
+	isElement(elm, name) {
 		if (typeof elm !== 'object') return
 		if (name === 'panelSize') return
 		if (name === 'body') return
@@ -217,6 +214,8 @@ class CanvasUI {
 		if (name === 'scene') return
 		return true
 	}
+
+	buildPanel() {}
 
 	merge(...objects) {
 		const isObject = (obj) => obj && typeof obj === 'object'
@@ -485,7 +484,7 @@ class CanvasUI {
 	getElementAtLocation(x, y) {
 		const self = this
 		const elms = Object.entries(this.config).filter(([name, elm]) => {
-			if (this.isCanvasUIMesh(elm, name)) {
+			if (this.isElement(elm, name)) {
 				const pos = elm.position
 				const width =
 					elm.width !== undefined ? elm.width : self.config.width
@@ -803,13 +802,6 @@ class CanvasUI {
 		})
 	}
 
-	createOffscreenCanvas(w, h) {
-		const canvas = document.createElement('canvas')
-		canvas.width = w
-		canvas.height = h
-		return canvas
-	}
-
 	fillRoundedRect(x, y, w, h, radius) {
 		const ctx = this.context
 		ctx.beginPath()
@@ -937,7 +929,7 @@ class CanvasUI {
 					? config.fontColor
 					: this.config.body.fontColor
 			context.fillStyle = '#aaa'
-			this.fillRoundedRect(pos.x + width - 12, pos.y, 12, height,config.borderRadius|| this.defaultConfig.body.borderRadius)
+			this.fillRoundedRect(pos.x + width - 12, pos.y, 12, height, 6)
 			context.fillStyle = '#666'
 			const scale = rect.height / textHeight
 			const thumbHeight = scale * height
@@ -947,7 +939,7 @@ class CanvasUI {
 				pos.y + thumbY,
 				12,
 				thumbHeight,
-				config.borderRadius || this.defaultConfig.body.borderRadius
+				6
 			)
 			context.fillStyle = fontColor
 			scrollY = config.scrollY
@@ -977,6 +969,4 @@ class CanvasUI {
 }
 
 export { CanvasUI }
-
-
 

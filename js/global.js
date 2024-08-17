@@ -3,7 +3,7 @@
 	build: '18.03.24.2352',
 	isOculus: false,
 	webGLcompatibility: false,
-	overWriteEnv: false,
+	overWriteEnv: true,
 	developing: true,
 	startButton: document.getElementById('start-button'),
 	bgm: document.getElementById('BGM-speaker'),
@@ -69,8 +69,7 @@
 	}
 	if (!GLOBAL_ENV.overWriteEnv) {
 		GLOBAL_ENV.isOculus = isOculus()
-	} else
-	{
+	} else {
 		GLOBAL_ENV.isOculus = GLOBAL_ENV.overWriteEnv
 	}
 	GLOBAL_ENV.devLog.info('0.isOculus = ' + GLOBAL_ENV.isOculus)

@@ -1,4 +1,4 @@
-﻿// const root = '/ctr-three146-static'
+﻿
 const root = '.'
 export const Areas = {
 	A_1: {

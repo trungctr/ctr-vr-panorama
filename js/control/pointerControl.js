@@ -7,6 +7,7 @@ class Pointer {
 		this.selectedObject = app.state.selectedObject
 		this.camera = app.camera
 		this.group = app.scene.getObjectByName('trackGroup')
+		this.scene = app.scene
 		this.raycaster = new THREE.Raycaster()
 		this.pointer = new THREE.Vector2()
 		this.actions = new ActionMapping(app)
@@ -24,30 +25,34 @@ class Pointer {
 		// console.log(this.pointer.x, this.pointer.y)
 		this.raycaster.setFromCamera(this.pointer, this.camera)
 
-		const intersects = this.raycaster.intersectObject(this.group, true)
+		const intersects = this.raycaster.intersectObject(this.scene, true)
 
 		if (intersects.length > 0) {
 			const res = intersects.filter(function (res) {
-				if (res.object.userMark) {
-					return res && res.object
-				}
+				return res.object.userMark
 			})[0]
-			if (res && res.object) {
-				console.log('Hovered: ', res.object.userMark, ': ', res.object.userEvent)
-				this.selectedObject = res.object
-				this.selectedObject.material.color.set('#ff0')
+			if (res) {
+				console.log(
+					'Hovered: ',
+					res.object.userMark,
+					': ',
+					res.object.userEvent
+				)
+				this.selectedObject = res
 			}
 		}
 	}
 	onPointerActive() {
-		if (this.selectedObject != null)
-		{
-			this.actions.activeAction(this.selectedObject.userEvent, this.selectedObject.userMark)
+		if (this.selectedObject != null) {
+			this.actions.activeAction(
+				this.selectedObject.object.userEvent,
+				this.selectedObject.object.userMark
+			)
 		}
 	}
 	listen() {
-		document.onmousemove=(e)=> this.onPointerMove(e)
-		document.onclick=(e)=> this.onPointerActive(e)
+		document.onmousemove = (e) => this.onPointerMove(e)
+		document.onclick = (e) => this.onPointerActive(e)
 	}
 }
 export default Pointer
